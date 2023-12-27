@@ -13,4 +13,11 @@ export const authOptions: AuthOptions = {
       clientSecret: env.LINE_CLIENT_SECRET,
     }),
   ],
+  pages: {
+    signIn: "/auth/signin",
+    signOut: "/auth/signout",
+    error: "/auth/error",
+    verifyRequest: "/auth/verify-request",
+    newUser: "/auth/new-user",
+  },
 };

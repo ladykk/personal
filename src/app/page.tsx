@@ -6,7 +6,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 export default function Home() {
   const { data: session } = useSession();
   return (
-    <div className="w-screen h-screen flex justify-center items-center flex-col">
+    <div className="min-h-svh flex justify-center items-center flex-col">
       {session ? (
         <>
           Sign in as {session.user?.name}
