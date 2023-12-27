@@ -17,8 +17,6 @@ export default async function AuthNewUserPage(props: Props) {
 
   if (!session) return redirect("/auth/error?error=AccessDenied");
 
-  console.log(session);
-
   return (
     <AuthContainer className="max-w-sm space-y-3">
       <p className="text-center font-medium text-lg my-3">
@@ -30,9 +28,6 @@ export default async function AuthNewUserPage(props: Props) {
       </Avatar>
       <p className="font-medium text-center">
         {session.user.name ?? session.user.email}
-      </p>
-      <p className="text-sm text-center">
-        Your account have been created successfully.
       </p>
       <RedirectCountdown
         seconds={5}
