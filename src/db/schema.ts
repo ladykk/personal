@@ -1,5 +1,7 @@
 import * as auth from "./schema/auth";
 
-export default {
+const schema = {
   ...auth,
 };
+
+export default schema;
