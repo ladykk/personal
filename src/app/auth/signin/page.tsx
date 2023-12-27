@@ -3,6 +3,7 @@ import { OAuthSignIn } from "./_client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
+import { AuthContainer } from "@/components/themes/auth";
 
 type Props = {
   searchParams: {
@@ -22,12 +23,12 @@ export default async function AuthSignInPage(props: Props) {
   const oauths = providers.filter((provider) => provider.type === "oauth");
 
   return (
-    <div className="p-5 border max-w-sm w-full rounded-lg shadow bg-white">
+    <AuthContainer className="max-w-sm">
       <p className="text-center font-medium text-lg my-3">Login to continue</p>
       <OAuthSignIn
         providers={oauths}
         callbackUrl={props.searchParams.callbackUrl}
       />
-    </div>
+    </AuthContainer>
   );
 }

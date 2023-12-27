@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
 
 export const metadata: Metadata = {
-  title: "Personal",
+  title: "ladyk.dev",
 };
 
 export default async function RootLayout({

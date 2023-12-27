@@ -24,5 +24,16 @@ export const authOptions: AuthOptions = {
     verifyRequest: "/auth/verify-request",
     newUser: "/auth/new-user",
   },
+  callbacks: {
+    session: async ({ session, user }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id,
+        },
+      };
+    },
+  },
   adapter: DrizzleAdapter(db) as Adapter,
 };
