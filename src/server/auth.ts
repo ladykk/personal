@@ -6,13 +6,17 @@ import LineProvider from "next-auth/providers/line";
 import type { Adapter } from "next-auth/adapters";
 
 export const authOptions: AuthOptions = {
-  adapter: DrizzleAdapter(db) as Adapter,
   providers: [
     LineProvider({
       clientId: env.LINE_CLIENT_ID,
       clientSecret: env.LINE_CLIENT_SECRET,
     }),
   ],
+  session: {
+    strategy: "database",
+    maxAge: 7 * 24 * 60 * 60, // 7 days,
+    updateAge: 24 * 60 * 60, // 24 hours
+  },
   pages: {
     signIn: "/auth/signin",
     signOut: "/auth/signout",
@@ -20,4 +24,5 @@ export const authOptions: AuthOptions = {
     verifyRequest: "/auth/verify-request",
     newUser: "/auth/new-user",
   },
+  adapter: DrizzleAdapter(db) as Adapter,
 };
