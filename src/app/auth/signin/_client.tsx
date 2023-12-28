@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useSearchParams } from "@/lib/search-params";
 import { OAuthTheme, SignInError, AuthSignInErrorCode } from "@/static/auth";
 import { ClientSafeProvider, signIn } from "next-auth/react";
@@ -17,11 +16,6 @@ export function OAuthSignIn(props: Props) {
   return (
     props.providers.length > 0 && (
       <div className="space-y-3">
-        <div className="flex gap-3 items-center text-sm font-medium">
-          <Separator className="flex-1" />
-          OR
-          <Separator className="flex-1" />
-        </div>
         {props.providers.map((provider) => (
           <Button
             key={provider.name}
