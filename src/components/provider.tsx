@@ -11,6 +11,7 @@ import { ThemeProvider } from "./themes/theme-provider";
 type Props = {
   children: React.ReactNode;
   session: Session | undefined | null;
+  authBasePath: string;
 };
 
 export default function Providers(props: Props) {
