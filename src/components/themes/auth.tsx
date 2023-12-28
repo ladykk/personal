@@ -9,7 +9,7 @@ export const AuthContainer = (props: AuthContainerProps) => {
   return (
     <div
       className={cn(
-        "p-5 border w-full rounded-lg shadow bg-white",
+        "p-5 border w-full rounded-lg shadow bg-card",
         props.className
       )}
     >

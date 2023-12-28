@@ -6,6 +6,7 @@ import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import { Toaster } from "./ui/sonner";
+import { ThemeProvider } from "./themes/theme-provider";
 
 type Props = {
   children: React.ReactNode;
@@ -26,8 +27,15 @@ export default function Providers(props: Props) {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <SessionProvider session={props.session}>
-        {props.children}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {props.children}
+          <Toaster />
+        </ThemeProvider>
       </SessionProvider>
     </trpc.Provider>
   );
