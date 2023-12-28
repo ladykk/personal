@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { NextURL } from "next/dist/server/web/next-url";
 import { NextRequest, NextResponse } from "next/server";
 
 export const config = {
@@ -14,26 +15,47 @@ export const config = {
   ],
 };
 
-export default async function middleware(req: NextRequest) {
-  const url = req.nextUrl;
+const subDomainMappings = {
+  site: "",
+  auth: "auth",
+} as const;
 
-  // Get hostname of request (e.g. auth.ladyk.dev, auth.localhost:3000)
+type SubDomain = keyof typeof subDomainMappings;
+
+const extractPath = (req: NextRequest) => {
   let hostname = req.headers
     .get("host")!
-    .replace(".localhost:3000", `.${env.ROOT_DOMAIN}`);
-
-  hostname.replace("www.", ""); // remove www. from domain
-
+    .replace(".localhost:3000", `.${env.ROOT_DOMAIN}`)
+    .replace("www.", "");
   const searchParams = req.nextUrl.searchParams.toString();
-  // Get the pathname of the request (e.g. /, /about, /blog/first-post)
-  const path = `${url.pathname}${
+  const path = `${req.nextUrl.pathname}${
     searchParams.length > 0 ? `?${searchParams}` : ""
   }`;
 
-  // rewrites for test pages.
-  if (hostname === `test.${env.ROOT_DOMAIN}`) {
+  return { hostname, path, searchParams };
+};
+
+const isSubDomain = (hostName: string, subDomain: SubDomain) =>
+  hostName ===
+  `${
+    subDomainMappings[subDomain].length > 0
+      ? `${subDomainMappings[subDomain]}.`
+      : ""
+  }${env.ROOT_DOMAIN}`;
+
+export default async function middleware(req: NextRequest) {
+  // Don't redirect if we're in development
+  if (env.VERCEL_ENV === "development") return NextResponse.next();
+
+  // Handle subdomains
+  const { hostname, path } = extractPath(req);
+
+  // rewrites for auth pages.
+  if (isSubDomain(hostname, "auth"))
     return NextResponse.rewrite(
-      new URL(`/test${path === "/" ? "" : path}`, req.url)
+      new URL(`/auth${path === "/" ? "" : path}`, req.url)
     );
-  }
+  else if (isSubDomain(hostname, "site"))
+    return NextResponse.rewrite(new URL(`/site${path}`, req.url));
+  else return NextResponse.next();
 }

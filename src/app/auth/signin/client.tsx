@@ -22,9 +22,15 @@ export function OAuthSignIn(props: Props) {
             className="w-full relative"
             variant="outline"
             onClick={() =>
-              signIn(provider.id, {
-                callbackUrl: props.callbackUrl,
-              })
+              toast.promise(
+                signIn(provider.id, {
+                  callbackUrl: props.callbackUrl,
+                }),
+                {
+                  loading: `Signing with "${provider.name}"`,
+                  error: `Cannot sign in with "${provider.name}", please try again.`,
+                }
+              )
             }
           >
             <Image

@@ -2,13 +2,6 @@ import { BuiltInProviderType } from "next-auth/providers/index";
 import { LiteralUnion } from "next-auth/react";
 import lineLogo from "@/assets/oauth/line.svg";
 
-type AuthPage = "signin" | "signout" | "error" | "verify-request" | "new-user";
-export const getAuthPage = (
-  url: string,
-  page: AuthPage,
-  callbackUrl?: string
-) => `${url}/auth/${page}${callbackUrl ? `?callbackUrl=${callbackUrl}` : ""}`;
-
 // Auth Sign In Error
 export type AuthSignInErrorCode =
   | "OAuthSignin"

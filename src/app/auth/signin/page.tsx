@@ -1,5 +1,5 @@
 import { ClientSafeProvider, getProviders } from "next-auth/react";
-import { ErrorHandle, OAuthSignIn } from "./_client";
+import { ErrorHandle, OAuthSignIn } from "./client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
