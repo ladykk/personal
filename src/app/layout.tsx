@@ -17,7 +17,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-svh bg-background font-sans antialiased">
+      <body className="min-h-svh bg-muted font-sans antialiased">
         <Providers session={session}>{children}</Providers>
       </body>
     </html>

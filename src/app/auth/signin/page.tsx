@@ -1,5 +1,5 @@
 import { getProviders } from "next-auth/react";
-import { OAuthSignIn } from "./_client";
+import { ErrorHandle, OAuthSignIn } from "./_client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
@@ -24,11 +24,14 @@ export default async function AuthSignInPage(props: Props) {
 
   return (
     <AuthContainer className="max-w-sm">
-      <p className="text-center font-medium text-lg my-3">Login to continue</p>
+      <p className="text-center font-medium text-lg my-3">
+        Sign in to continue
+      </p>
       <OAuthSignIn
         providers={oauths}
         callbackUrl={props.searchParams.callbackUrl}
       />
+      <ErrorHandle />
     </AuthContainer>
   );
 }

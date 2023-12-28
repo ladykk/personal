@@ -1,6 +1,108 @@
 import { BuiltInProviderType } from "next-auth/providers/index";
 import { LiteralUnion } from "next-auth/react";
 
+// Auth Sign In Error
+export type AuthSignInErrorCode =
+  | "OAuthSignin"
+  | "OAuthCallback"
+  | "OAuthCreateAccount"
+  | "EmailCreateAccount"
+  | "Callback"
+  | "OAuthAccountNotLinked"
+  | "EmailSignin"
+  | "CredentialsSignin"
+  | "SessionRequired"
+  | "Default";
+
+type SignInError = {
+  [key in AuthSignInErrorCode]: {
+    code: key;
+    message: string;
+  };
+};
+
+export const SignInError: SignInError = {
+  OAuthSignin: {
+    code: "OAuthSignin",
+    message: "Error in constructing an authorization URL.",
+  },
+  OAuthCallback: {
+    code: "OAuthCallback",
+    message: "Error in handling the response from an OAuth provider.",
+  },
+  OAuthCreateAccount: {
+    code: "OAuthCreateAccount",
+    message: "Could not create OAuth provider user in the database.",
+  },
+  EmailCreateAccount: {
+    code: "EmailCreateAccount",
+    message: "Could not create email provider user in the database.",
+  },
+  Callback: {
+    code: "Callback",
+    message: "Error in the OAuth callback handler route.",
+  },
+  OAuthAccountNotLinked: {
+    code: "OAuthAccountNotLinked",
+    message:
+      "This email address is already associated with an account, please sign in with the correct provider.",
+  },
+  EmailSignin: {
+    code: "EmailSignin",
+    message:
+      "Failed to send the verification token to your email, please try again.",
+  },
+  CredentialsSignin: {
+    code: "CredentialsSignin",
+    message:
+      "Username and password combination not found, please check you have entered your details correctly.",
+  },
+  SessionRequired: {
+    code: "SessionRequired",
+    message: "Please sign in to continue.",
+  },
+  Default: {
+    code: "Default",
+    message: "Something went wrong. Please try again later.",
+  },
+};
+
+// Auth Error
+export type AuthErrorCode =
+  | "Configuration"
+  | "AccessDenied"
+  | "Verification"
+  | "Default";
+
+type AuthError = {
+  [key in AuthErrorCode]: {
+    code: key;
+    message: string;
+  };
+};
+
+export const AuthError: AuthError = {
+  Configuration: {
+    code: "Configuration",
+    message:
+      "The authentication configuration is incorrect, please check the environment variables.",
+  },
+  AccessDenied: {
+    code: "AccessDenied",
+    message:
+      "You do not have permission to access this resource, please contact the administrator.",
+  },
+  Verification: {
+    code: "Verification",
+    message:
+      "The verification token is invalid or has expired, please try again.",
+  },
+  Default: {
+    code: "Default",
+    message: "Something went wrong, please try again later.",
+  },
+};
+
 type OAuthTheme = {
   [key in LiteralUnion<BuiltInProviderType>]:
     | {

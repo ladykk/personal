@@ -7,7 +7,7 @@ type Props = {
 
 export default function AuthTemplate(props: Props) {
   return (
-    <div className="min-h-svh w-screen bg-muted grid grid-rows-[4rem_1fr_3rem]">
+    <div className="min-h-svh w-screen grid grid-rows-[4rem_1fr_3rem]">
       <div className="flex-1 flex justify-between items-center w-full p-3">
         <BackLink />
         <ModeToggle />

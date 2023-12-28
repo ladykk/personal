@@ -1,9 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { OAuthTheme } from "@/static/auth";
+import { useSearchParams } from "@/lib/search-params";
+import { OAuthTheme, SignInError, AuthSignInErrorCode } from "@/static/auth";
 import { ClientSafeProvider, signIn } from "next-auth/react";
 import Image from "next/image";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 type Props = {
   providers: Array<ClientSafeProvider>;
@@ -43,4 +46,25 @@ export function OAuthSignIn(props: Props) {
       </div>
     )
   );
+}
+
+export function ErrorHandle() {
+  const searchParams = useSearchParams({
+    error: "" as AuthSignInErrorCode,
+  });
+
+  // Add Toast when error is not null
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (searchParams.values.error.length > 0)
+        toast.error("Cannot sign in", {
+          description:
+            SignInError[searchParams.values.error]?.message ??
+            SignInError["Default"].message,
+        });
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return null;
 }

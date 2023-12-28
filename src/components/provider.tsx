@@ -34,7 +34,7 @@ export default function Providers(props: Props) {
           disableTransitionOnChange
         >
           {props.children}
-          <Toaster />
+          <Toaster position="top-center" richColors />
         </ThemeProvider>
       </SessionProvider>
     </trpc.Provider>
