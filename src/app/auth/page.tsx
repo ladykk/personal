@@ -18,5 +18,5 @@ export default async function AuthPage(props: Props) {
         ? `?callbackUrl=${props.searchParams.callbackUrl}`
         : ""
     );
-  else redirect(props.searchParams.callbackUrl ?? env.NEXT_PUBLIC_ROOT_DOMAIN);
+  else redirect(props.searchParams.callbackUrl ?? env.ROOT_DOMAIN);
 }
