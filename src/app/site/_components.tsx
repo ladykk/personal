@@ -134,7 +134,7 @@ export const Topbar = (props: TopbarProps) => {
           </NavScrollLinks>
         </DropdownMenuContent>
       </DropdownMenu>
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2">
         <AuthSection ROOT_DOMAIN={props.ROOT_DOMAIN} />
         <ThemeToggle />
       </div>
