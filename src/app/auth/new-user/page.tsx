@@ -4,7 +4,7 @@ import { getNamePrefix } from "@/lib/utils";
 import { authOptions } from "@/server/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { RedirectCountdown } from "./client";
+import { RedirectCountdown } from "./_components";
 
 type Props = {
   searchParams: {

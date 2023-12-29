@@ -1,6 +1,7 @@
 import { env } from "@/env";
-import { NextURL } from "next/dist/server/web/next-url";
 import { NextRequest, NextResponse } from "next/server";
+import { Application, SubDomainMappings } from "./static/app";
+import { extractPath, isSubDomain } from "./lib/url";
 
 export const config = {
   matcher: [
@@ -15,47 +16,21 @@ export const config = {
   ],
 };
 
-const subDomainMappings = {
-  site: "",
-  auth: "auth",
-} as const;
-
-type SubDomain = keyof typeof subDomainMappings;
-
-const extractPath = (req: NextRequest) => {
-  let hostname = req.headers
-    .get("host")!
-    .replace(".localhost:3000", `.${env.ROOT_DOMAIN}`)
-    .replace("www.", "");
-  const searchParams = req.nextUrl.searchParams.toString();
-  const path = `${req.nextUrl.pathname}${
-    searchParams.length > 0 ? `?${searchParams}` : ""
-  }`;
-
-  return { hostname, path, searchParams };
-};
-
-const isSubDomain = (hostName: string, subDomain: SubDomain) =>
-  hostName ===
-  `${
-    subDomainMappings[subDomain].length > 0
-      ? `${subDomainMappings[subDomain]}.`
-      : ""
-  }${env.ROOT_DOMAIN}`;
-
 export default async function middleware(req: NextRequest) {
   // Don't redirect if we're in development
   if (env.VERCEL_ENV === "development") return NextResponse.next();
 
   // Handle subdomains
-  const { hostname, path } = extractPath(req);
+  const { hostname, path } = extractPath(env.NEXT_PUBLIC_ROOT_DOMAIN, req);
 
   // rewrites for auth pages.
-  if (isSubDomain(hostname, "auth"))
+  if (isSubDomain(env.NEXT_PUBLIC_ROOT_DOMAIN, hostname, "auth"))
     return NextResponse.rewrite(
       new URL(`/auth${path === "/" ? "" : path}`, req.url)
     );
-  else if (isSubDomain(hostname, "site"))
+  // rewrites for site pages.
+  else if (isSubDomain(env.NEXT_PUBLIC_ROOT_DOMAIN, hostname, "site"))
     return NextResponse.rewrite(new URL(`/site${path}`, req.url));
+  // others ignore.
   else return NextResponse.next();
 }

@@ -1,21 +1,6 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { env } from "@/env";
+import SiteClient from "./_client";
 
 export default function SitePage() {
-  const { data: session } = useSession();
-  return (
-    <div className="min-h-svh flex flex-col items-center justify-center">
-      {session ? (
-        <>
-          <p>Welcome, {session.user.name ?? session.user.email}!</p>
-          <Button onClick={() => signOut()}>Sign Out</Button>
-        </>
-      ) : (
-        <>
-          <Button onClick={() => signIn()}>Sign In</Button>
-        </>
-      )}
-    </div>
-  );
+  return <SiteClient ROOT_DOMAIN={env.NEXT_PUBLIC_ROOT_DOMAIN} />;
 }

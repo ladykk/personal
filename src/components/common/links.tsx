@@ -1,6 +1,7 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export function BackLink() {
@@ -11,5 +12,14 @@ export function BackLink() {
       <ChevronLeft className="p-0.5 mr-1" />
       Back
     </Button>
+  );
+}
+
+export function HomePageLink() {
+  console.log(window.location);
+  return (
+    <Link href={window.location.origin} className={buttonVariants()}>
+      Go to homepage
+    </Link>
   );
 }

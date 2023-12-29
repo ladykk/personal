@@ -1,5 +1,5 @@
 import { ClientSafeProvider, getProviders } from "next-auth/react";
-import { ErrorHandle, OAuthSignIn } from "./client";
+import { ErrorHandle, OAuthSignIn } from "./_components";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
@@ -30,7 +30,7 @@ export default async function AuthSignInPage(props: Props) {
 
   return (
     <AuthContainer className="max-w-sm">
-      <p className="text-center font-medium text-lg my-3">
+      <p className="text-center font-medium text-lg my-3 mb-5">
         Sign in to continue
       </p>
       {count.credentials + count.email > 0 && (

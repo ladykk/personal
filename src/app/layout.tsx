@@ -3,11 +3,12 @@ import "./globals.css";
 import Providers from "@/components/provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
-import { cookies } from "next/headers";
 import { env } from "@/env";
 
 export const metadata: Metadata = {
   title: "ladyk.dev",
+  description:
+    "A monorepos project to prove the concept of reusability, scalability, and development experience.",
 };
 
 export default async function RootLayout({

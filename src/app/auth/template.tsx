@@ -1,4 +1,4 @@
-import { ModeToggle } from "@/components/themes/mode";
+import { ThemeToggle } from "@/components/themes";
 import { BackLink } from "@/components/common/links";
 
 type Props = {
@@ -10,7 +10,7 @@ export default function AuthTemplate(props: Props) {
     <div className="min-h-svh w-screen grid grid-rows-[auto_1fr_auto]">
       <div className="flex-1 flex justify-between items-center w-full p-3">
         <BackLink />
-        <ModeToggle />
+        <ThemeToggle />
       </div>
       <div className="flex justify-center items-center">{props.children}</div>
       <div className="p-5">

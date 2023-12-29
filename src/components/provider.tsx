@@ -6,7 +6,7 @@ import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import { Toaster } from "./ui/sonner";
-import { ThemeProvider } from "./themes/theme-provider";
+import { ThemeProvider } from "./themes";
 
 type Props = {
   children: React.ReactNode;

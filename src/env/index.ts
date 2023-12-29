@@ -12,10 +12,11 @@ export const env = createEnv({
     LINE_CLIENT_SECRET: z.string(),
     NEXTAUTH_SECRET: z.string(),
     NEXTAUTH_URL: z.string(),
-    ROOT_DOMAIN: z.string(),
   },
   clientPrefix: "NEXT_PUBLIC_",
-  client: {},
+  client: {
+    NEXT_PUBLIC_ROOT_DOMAIN: z.string(),
+  },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
 });

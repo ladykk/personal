@@ -4,12 +4,12 @@ import { AuthOptions } from "next-auth";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import LineProvider from "next-auth/providers/line";
 import type { Adapter } from "next-auth/adapters";
+import { getAppUrl, handleRedirect } from "@/lib/url";
 
 const useSecureCookies = env.NEXTAUTH_URL.startsWith("https://");
 const cookiePrefix = useSecureCookies ? "__Secure-" : "";
 const hostName = new URL(env.NEXTAUTH_URL).hostname;
-const rootDomain = env.ROOT_DOMAIN;
-const pageBasePath = useSecureCookies ? env.NEXTAUTH_URL : "/auth";
+const RootDomain = env.NEXT_PUBLIC_ROOT_DOMAIN;
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -19,14 +19,14 @@ export const authOptions: AuthOptions = {
     }),
   ],
   pages: {
-    signIn: `${pageBasePath}/signin`,
-    signOut: `${pageBasePath}/signout`,
-    error: `${pageBasePath}/error`,
-    verifyRequest: `${pageBasePath}/verify-request`,
-    newUser: `${pageBasePath}/new-user`,
+    signIn: getAppUrl(RootDomain, "auth", "/signin"),
+    signOut: getAppUrl(RootDomain, "auth", "/signout"),
+    error: getAppUrl(RootDomain, "auth", "/error"),
+    verifyRequest: getAppUrl(RootDomain, "auth", "/verify-request"),
+    newUser: getAppUrl(RootDomain, "auth", "/new-user"),
   },
   callbacks: {
-    session: async ({ session, user }) => {
+    session: ({ session, user }) => {
       return {
         ...session,
         user: {
@@ -35,9 +35,7 @@ export const authOptions: AuthOptions = {
         },
       };
     },
-    redirect: async ({ url, baseUrl }) => {
-      return url ?? baseUrl;
-    },
+    redirect: ({ url, baseUrl }) => handleRedirect(RootDomain, url, baseUrl),
   },
   session: {
     strategy: "database",
@@ -55,7 +53,7 @@ export const authOptions: AuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: useSecureCookies,
-        domain: hostName == "localhost" ? hostName : "." + rootDomain,
+        domain: hostName == "localhost" ? hostName : "." + RootDomain,
       },
     },
   },
