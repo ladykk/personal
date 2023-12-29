@@ -1,6 +1,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AuthError, AuthErrorCode } from "@/static/auth";
+import { Metadata } from "next";
 import Link from "next/link";
 
 type Props = {
@@ -8,6 +9,10 @@ type Props = {
     callbackUrl?: string;
     error?: AuthErrorCode;
   };
+};
+
+export const metadata: Metadata = {
+  title: "Something went wrong | ladyk.dev",
 };
 
 export default function AuthErrorPage(props: Props) {

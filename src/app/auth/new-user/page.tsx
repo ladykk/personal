@@ -6,6 +6,10 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { RedirectCountdown } from "./_components";
 
+export const metadata = {
+  title: "Welcome to ladyk.dev | ladyk.dev",
+};
+
 type Props = {
   searchParams: {
     callbackUrl?: string;

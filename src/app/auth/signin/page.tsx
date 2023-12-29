@@ -5,6 +5,11 @@ import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
 import { AuthContainer } from "@/components/themes/auth";
 import { Separator } from "@/components/ui/separator";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sign in | ladyk.dev",
+};
 
 type Props = {
   searchParams: {
@@ -21,10 +26,13 @@ export default async function AuthSignInPage(props: Props) {
     result ? Object.values(result) : []
   );
 
-  const count = providers.reduce((acc, provider) => {
-    acc[provider.type] += 1;
-    return acc;
-  }, {} as { [key in ClientSafeProvider["type"]]: number });
+  const count = providers.reduce(
+    (acc, provider) => {
+      acc[provider.type] += 1;
+      return acc;
+    },
+    {} as { [key in ClientSafeProvider["type"]]: number }
+  );
 
   const oauths = providers.filter((provider) => provider.type === "oauth");
 
