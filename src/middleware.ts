@@ -34,19 +34,6 @@ export default async function middleware(req: NextRequest) {
     // Handle Rewrite
     const { basePath } = mapping;
     res = NextResponse.rewrite(new URL(`/${basePath}${path}`, req.url));
-
-    // Handle Cors on different subdomain
-    if (hostname !== `${subDomain ? `${subDomain}.` : ""}${env.ROOT_DOMAIN}`)
-      res.headers.append("Access-Control-Allow-Credentials", "true");
-    res.headers.append("Access-Control-Allow-Origin", `https://${hostname}`);
-    res.headers.append(
-      "Access-Control-Allow-Methods",
-      "GET,DELETE,PATCH,POST,PUT"
-    );
-    res.headers.append(
-      "Access-Control-Allow-Headers",
-      "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-    );
   }
 
   return res;

@@ -23,13 +23,3 @@ export const uploadFile = async (
     else return json as { status: "error"; error: string };
   });
 };
-
-export const deleteFile = async (key: string, ROOT_DOMAIN: string) => {
-  return await fetch(`${getAppUrl(ROOT_DOMAIN, "storage", `/${key}`)}`, {
-    method: "DELETE",
-  }).then(async (res) => {
-    const json = await res.json();
-    if (res.status === 201) return json as { status: "success" };
-    else return json as { status: "error"; error: string };
-  });
-};
