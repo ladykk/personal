@@ -14,7 +14,7 @@ export const uploadFile = async (
   key: string,
   ROOT_DOMAIN: string
 ) => {
-  return await fetch(`${getAppUrl(ROOT_DOMAIN, "storage", `/${key}`)}`, {
+  return await fetch(`/api/storage/${key}`, {
     method: "PUT",
     body: file,
     mode: "no-cors",
