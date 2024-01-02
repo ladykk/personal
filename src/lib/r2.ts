@@ -17,7 +17,7 @@ export const uploadFile = async (
   return await fetch(`${getAppUrl(ROOT_DOMAIN, "storage", `/${key}`)}`, {
     method: "PUT",
     body: file,
-    mode: "same-origin",
+    mode: "no-cors",
   }).then(async (res) => {
     const json = await res.json();
     if (res.status === 201) return json as { status: "success" };
