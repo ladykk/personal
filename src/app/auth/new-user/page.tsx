@@ -1,7 +1,7 @@
 import { AuthContainer } from "@/components/themes/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getNamePrefix } from "@/lib/utils";
-import { authOptions } from "@/server/auth";
+import { authOptions } from "@/server/services/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { RedirectCountdown } from "./_components";
@@ -27,7 +27,7 @@ export default async function AuthNewUserPage(props: Props) {
         Welcome to ladyk.dev
       </p>
       <Avatar className="w-20 h-20 mx-auto">
-        <AvatarImage src={session.user.image ?? ""} />
+        <AvatarImage src={session.user.image} />
         <AvatarFallback>{getNamePrefix(session.user.name)}</AvatarFallback>
       </Avatar>
       <p className="font-medium text-center">

@@ -1,7 +1,7 @@
 import { ClientSafeProvider, getProviders } from "next-auth/react";
 import { ErrorHandle, OAuthSignIn } from "./_components";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/server/auth";
+import { authOptions } from "@/server/services/auth";
 import { redirect } from "next/navigation";
 import { AuthContainer } from "@/components/themes/auth";
 import { Separator } from "@/components/ui/separator";

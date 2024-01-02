@@ -1,8 +1,27 @@
-export type Application = "site" | "auth" | "timesheet";
+export type Application = "site" | "auth" | "timesheet" | "storage";
 
-export type TSubDomainMappings = { [key in Application]: string };
+export type TSubDomainMappings = {
+  [key in Application]: {
+    subDomain: string;
+    basePath: string;
+  };
+};
 export const SubDomainMappings: TSubDomainMappings = {
-  site: "",
-  auth: "auth",
-  timesheet: "timesheet",
+  site: {
+    subDomain: "",
+    basePath: "site",
+  },
+  auth: {
+    subDomain: "auth",
+    basePath: "auth",
+  },
+  timesheet: {
+    subDomain: "timesheet",
+    basePath: "timesheet",
+  },
+
+  storage: {
+    subDomain: "storage",
+    basePath: "api/storage",
+  },
 } as const;

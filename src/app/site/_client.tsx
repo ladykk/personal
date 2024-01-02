@@ -8,10 +8,10 @@ import { TechStack } from "@/static/tech-stack";
 import Image from "next/image";
 import { scrollSpy } from "react-scroll";
 
-type SiteClient = {
+type Props = {
   ROOT_DOMAIN: string;
 };
-export default function SiteClient(props: SiteClient) {
+export default function SiteClient(props: Props) {
   // Update scrollspy on mount
   useEffect(() => {
     scrollSpy.update();

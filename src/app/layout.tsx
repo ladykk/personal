@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Providers from "@/components/provider";
+import Providers from "@/components/common/provider";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/server/auth";
+import { authOptions } from "@/server/services/auth";
 import { env } from "@/env";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "ladyk.dev",
@@ -21,7 +22,11 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-svh bg-muted font-sans antialiased">
-        <Providers session={session} authBasePath={env.NEXTAUTH_URL}>
+        <Providers
+          cookies={cookies()}
+          session={session}
+          authBasePath={env.NEXTAUTH_URL}
+        >
           {children}
         </Providers>
       </body>

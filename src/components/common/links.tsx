@@ -16,7 +16,6 @@ export function BackLink() {
 }
 
 export function HomePageLink() {
-  console.log(window.location);
   return (
     <Link href={window.location.origin} className={buttonVariants()}>
       Go to homepage

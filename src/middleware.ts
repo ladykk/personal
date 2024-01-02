@@ -1,7 +1,8 @@
 import { env } from "@/env";
 import { NextRequest, NextResponse } from "next/server";
-import { Application, SubDomainMappings } from "./static/app";
-import { extractPath, isSubDomain } from "./lib/url";
+
+import { extractPath } from "./lib/url";
+import { SubDomainMappings } from "./static/app";
 
 export const config = {
   matcher: [
@@ -21,16 +22,17 @@ export default async function middleware(req: NextRequest) {
   if (env.VERCEL_ENV === "development") return NextResponse.next();
 
   // Handle subdomains
-  const { hostname, path } = extractPath(env.NEXT_PUBLIC_ROOT_DOMAIN, req);
+  const { hostname, path } = extractPath(req);
 
-  // rewrites for auth pages.
-  if (isSubDomain(env.NEXT_PUBLIC_ROOT_DOMAIN, hostname, "auth"))
-    return NextResponse.rewrite(
-      new URL(`/auth${path === "/" ? "" : path}`, req.url)
-    );
-  // rewrites for site pages.
-  else if (isSubDomain(env.NEXT_PUBLIC_ROOT_DOMAIN, hostname, "site"))
-    return NextResponse.rewrite(new URL(`/site${path}`, req.url));
-  // others ignore.
-  else return NextResponse.next();
+  // Handle Rewrite
+  const subDomain = hostname.replace(`.${env.ROOT_DOMAIN}`, "");
+
+  const mapping = Object.values(SubDomainMappings).find(
+    (item) => item.subDomain === subDomain
+  );
+
+  if (!mapping) return NextResponse.next();
+
+  const { basePath } = mapping;
+  return NextResponse.rewrite(new URL(`/${basePath}${path}`, req.url));
 }
