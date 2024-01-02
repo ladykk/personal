@@ -18,21 +18,36 @@ export const config = {
 };
 
 export default async function middleware(req: NextRequest) {
+  let res = NextResponse.next();
   // Don't redirect if we're in development
-  if (env.VERCEL_ENV === "development") return NextResponse.next();
+  if (env.VERCEL_ENV === "development") return res;
 
-  // Handle subdomains
-  const { hostname, path } = extractPath(req);
+  // Extract Path
+  const { hostname, path, subDomain } = extractPath(env.ROOT_DOMAIN, req);
 
-  // Handle Rewrite
-  const subDomain = hostname.replace(`.${env.ROOT_DOMAIN}`, "");
-
+  // Get SubDomain Mapping
   const mapping = Object.values(SubDomainMappings).find(
     (item) => item.subDomain === subDomain
   );
 
-  if (!mapping) return NextResponse.next();
+  if (mapping) {
+    // Handle Rewrite
+    const { basePath } = mapping;
+    res = NextResponse.rewrite(new URL(`/${basePath}${path}`, req.url));
 
-  const { basePath } = mapping;
-  return NextResponse.rewrite(new URL(`/${basePath}${path}`, req.url));
+    // Handle Cors on different subdomain
+    if (hostname !== `${subDomain ? `${subDomain}.` : ""}${env.ROOT_DOMAIN}`)
+      res.headers.append("Access-Control-Allow-Credentials", "true");
+    res.headers.append("Access-Control-Allow-Origin", `https://${hostname}`);
+    res.headers.append(
+      "Access-Control-Allow-Methods",
+      "GET,DELETE,PATCH,POST,PUT"
+    );
+    res.headers.append(
+      "Access-Control-Allow-Headers",
+      "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+    );
+  }
+
+  return res;
 }
