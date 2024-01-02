@@ -1,12 +1,10 @@
 import { env } from "@/env";
 import dayjs from "@/lib/dayjs";
-import { extractPath } from "@/lib/url";
 import { db } from "@/server/db";
 import { files } from "@/server/db/schema/storage";
 import { R2, checkAccessControl } from "@/server/services/r2";
-import { SubDomainMappings } from "@/static/app";
 import { eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
 
 type Props = {
@@ -168,34 +166,4 @@ export const PUT = async (req: NextRequest, props: Props) => {
       status: 201,
     }
   );
-};
-
-// OPTIONS /api/storage/[id]
-export const OPTIONS = async (req: NextRequest, props: Props) => {
-  const res = new NextResponse(null, {
-    status: 200,
-  });
-
-  const { hostname, subDomain } = extractPath(env.ROOT_DOMAIN, req);
-
-  const mapping = Object.values(SubDomainMappings).find(
-    (item) => item.subDomain === subDomain
-  );
-
-  if (mapping) {
-    if (hostname !== `${subDomain ? `${subDomain}.` : ""}${env.ROOT_DOMAIN}`) {
-      res.headers.append("Access-Control-Allow-Credentials", "true");
-      res.headers.append("Access-Control-Allow-Origin", `https://${hostname}`);
-      res.headers.append(
-        "Access-Control-Allow-Methods",
-        "GET,DELETE,PATCH,POST,PUT"
-      );
-      res.headers.append(
-        "Access-Control-Allow-Headers",
-        "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-      );
-    }
-  }
-
-  return res;
 };
