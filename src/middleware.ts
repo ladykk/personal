@@ -34,6 +34,7 @@ export default async function middleware(req: NextRequest) {
     // Handle Rewrite
     const { basePath } = mapping;
     const newUrl = new URL(`/${basePath}${path}`, req.url);
+    console.log(`[Middleware]: Redirecting ${req.url} to ${newUrl.href}`);
     res = NextResponse.rewrite(newUrl);
   }
 
