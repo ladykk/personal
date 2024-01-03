@@ -20,13 +20,3 @@ export const getAppUrl = (
         SubDomainMappings[app].basePath
       }${path}${searchParams.toString()}`;
 };
-
-export const extractPath = (ROOT_DOMAIN: string, req: NextRequest) => {
-  let hostname = req.headers.get("host")!.replace("www.", "");
-  const searchParams = req.nextUrl.searchParams.toString();
-  const path = `${req.nextUrl.pathname}${
-    searchParams.length > 0 ? `?${searchParams}` : ""
-  }`;
-  const subDomain = hostname.replace(`${ROOT_DOMAIN}`, "").replace(".", "");
-  return { hostname, path, searchParams, subDomain };
-};
