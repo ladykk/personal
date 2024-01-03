@@ -33,6 +33,7 @@ export default async function middleware(req: NextRequest) {
   if (mapping) {
     // Handle Rewrite
     console.log("Rewriting...");
+    console.log(`Original: ${req.nextUrl.toString()}`);
     const { basePath } = mapping;
     const newUrl = new URL(`/${basePath}${path}`, req.url);
     console.log(newUrl.toString());
