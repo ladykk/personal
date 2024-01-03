@@ -21,6 +21,6 @@ export const SubDomainMappings: TSubDomainMappings = {
   },
   storage: {
     subDomain: "storage",
-    basePath: "api/storage",
+    basePath: "storage",
   },
 } as const;
