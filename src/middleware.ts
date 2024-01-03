@@ -30,10 +30,11 @@ export default async function middleware(req: NextRequest) {
     (item) => item.subDomain === subDomain
   );
 
+  console.log(`Original: ${req.nextUrl.toString()}`);
+
   if (mapping) {
     // Handle Rewrite
     console.log("Rewriting...");
-    console.log(`Original: ${req.nextUrl.toString()}`);
     const { basePath } = mapping;
     const newUrl = new URL(`/${basePath}${path}`, req.url);
     console.log(newUrl.toString());
