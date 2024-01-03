@@ -16,7 +16,5 @@ export const getAppUrl = (
         SubDomainMappings[app].subDomain.length > 0
           ? `${SubDomainMappings[app].subDomain}.`
           : ""
-      }${ROOT_DOMAIN}/${
-        SubDomainMappings[app].basePath
-      }${path}${searchParams.toString()}`;
+      }${ROOT_DOMAIN}/${path}${searchParams.toString()}`;
 };

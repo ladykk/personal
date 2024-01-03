@@ -93,7 +93,7 @@ export default function AuthAccountClient(props: Props) {
                       data.image = getAppUrl(
                         props.ROOT_DOMAIN,
                         "storage",
-                        `/${key}`
+                        `/file/${key}`
                       );
                     }
                     updateProfile.mutateAsync(data);

@@ -123,7 +123,7 @@ export const generatePresignedUrl = async (
 };
 
 export const deleteFileByUrl = async (url: string) => {
-  const baseStorageUrl = getAppUrl(env.ROOT_DOMAIN, "storage", "/");
+  const baseStorageUrl = getAppUrl(env.ROOT_DOMAIN, "storage", "/file");
 
   // Skip if the url is not a storage url
   if (!url.startsWith(baseStorageUrl)) return;
