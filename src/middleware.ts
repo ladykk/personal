@@ -14,7 +14,7 @@ export const config = {
      * 4. all root files inside /public (e.g. /favicon.ico)
      * 5. /file (storage subdomain)
      */
-    "/((?!api/|_next/|_static/|_vercel|file|[\\w-]+\\.\\w+).*)",
+    "/((?!api/|_next/|_static/|_vercel|file/|[\\w-]+\\.\\w+).*)",
   ],
 };
 
