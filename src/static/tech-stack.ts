@@ -8,6 +8,7 @@ import shadcnUi from "@/assets/tech-stack/shadcn-ui.svg";
 import tailwind from "@/assets/tech-stack/tailwind.svg";
 import trpc from "@/assets/tech-stack/trpc.svg";
 import zod from "@/assets/tech-stack/zod.svg";
+import cloudflare from "@/assets/tech-stack/cloudflare.png";
 
 export const TechStack = [
   {
@@ -69,5 +70,11 @@ export const TechStack = [
     logo: drizzleOrm,
     link: "https://orm.drizzle.team/",
     usage: "TypeScript ORM",
+  },
+  {
+    name: "Cloudflare R2",
+    logo: cloudflare,
+    link: "https://www.cloudflare.com/developer-platform/r2/",
+    usage: "Object Storage",
   },
 ];
