@@ -33,7 +33,7 @@ export default async function middleware(req: NextRequest) {
   if (mapping) {
     // Handle Rewrite
     const { basePath } = mapping;
-    res = NextResponse.rewrite(new URL(`/${basePath}${path}`, req.url));
+    res = NextResponse.rewrite(new URL(`/${basePath}/${path}`, req.url));
   }
 
   return res;
