@@ -29,10 +29,10 @@ export const ScreenSpinner = (props: ScreenSpinnerProps) => {
     <div
       data-state={open ? "open" : "closed"}
       className={cn(
-        "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 flex justify-center items-center"
+        "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 flex justify-center items-center"
       )}
     >
-      <Spinner className="w-16 h-16" />
+      <Spinner className="w-16 h-16 text-white/80" />
     </div>
   ) : null;
 };
