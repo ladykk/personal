@@ -5,7 +5,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export default function AuthTemplate(props: Props) {
+export default function AuthLayout(props: Props) {
   return (
     <div className="min-h-svh w-screen grid grid-rows-[auto_1fr_auto]">
       <div className="flex-1 flex justify-between items-center w-full p-3">
