@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import favicon from "public/favicons/site.png";
 
 export const metadata: Metadata = {
   title:
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "A monorepos project to prove the concept of reusability, scalability, and development experience.",
   icons: {
-    icon: "/favicons/site.png",
+    icon: favicon.src,
   },
 };
 
