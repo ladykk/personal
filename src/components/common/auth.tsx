@@ -21,6 +21,7 @@ type AuthSectionProps = {
   buttonVariantsProps?: VariantProps<typeof buttonVariants>;
   buttonClassName?: string;
   ROOT_DOMAIN: string;
+  hideName?: boolean;
 };
 export const AuthSection = (props: AuthSectionProps) => {
   const { data: session, status } = useSession();
@@ -32,19 +33,18 @@ export const AuthSection = (props: AuthSectionProps) => {
         <Fragment>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex gap-2 hover:cursor-pointer">
+              <div className="flex gap-2 hover:cursor-pointer items-center">
+                {!props.hideName && (
+                  <p className="hidden sm:block text-sm font-medium">
+                    Welcome, {session?.user?.name ?? session?.user?.email}!
+                  </p>
+                )}
                 <Avatar className="w-10 h-10 border">
                   <AvatarImage src={session?.user?.image} />
                   <AvatarFallback>
                     {getNamePrefix(session?.user?.name)}
                   </AvatarFallback>
                 </Avatar>
-                <Button
-                  variant={props.buttonVariantsProps?.variant ?? "outline"}
-                  className="hidden sm:block"
-                >
-                  Welcome, {session?.user?.name ?? session?.user?.email}!
-                </Button>
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
