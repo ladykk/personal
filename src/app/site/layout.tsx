@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import favicon from "public/favicons/site.png";
+import favicon from "@/assets/favicons/site.png";
 
 export const metadata: Metadata = {
   title:
