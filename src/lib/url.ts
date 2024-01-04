@@ -1,5 +1,4 @@
 import { Application, SubDomainMappings } from "@/static/app";
-import { NextRequest } from "next/server";
 
 export const getAppUrl = (
   ROOT_DOMAIN: string,
@@ -8,13 +7,16 @@ export const getAppUrl = (
   searchParams: URLSearchParams = new URLSearchParams()
 ) => {
   const isDev = ROOT_DOMAIN.startsWith("localhost");
+  const searchParamsString = searchParams.toString();
   return isDev
-    ? `http://${ROOT_DOMAIN}/${
-        SubDomainMappings[app].basePath
-      }${path}${searchParams?.toString()}`
+    ? `http://${ROOT_DOMAIN}/${SubDomainMappings[app].basePath}${path}${
+        searchParamsString.length > 0 ? `?${searchParamsString}` : ""
+      }`
     : `https://${
         SubDomainMappings[app].subDomain.length > 0
           ? `${SubDomainMappings[app].subDomain}.`
           : ""
-      }${ROOT_DOMAIN}/${path}${searchParams.toString()}`;
+      }${ROOT_DOMAIN}/${path}${
+        searchParamsString.length > 0 ? `?${searchParamsString}` : ""
+      }`;
 };

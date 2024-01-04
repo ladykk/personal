@@ -16,7 +16,14 @@ export const config = {
 };
 
 export default async function middleware(req: NextRequest) {
-  let res = NextResponse.next();
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-url", req.url);
+  let res = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
   // Don't redirect if we're in development
   if (env.VERCEL_ENV === "development") return res;
 
@@ -37,8 +44,11 @@ export default async function middleware(req: NextRequest) {
     // Handle Rewrite
     const { basePath } = mapping;
     const newUrl = new URL(`/${basePath}${path}`, req.url);
-    console.log(`[Middleware]: Redirecting ${req.url} to ${newUrl.href}`);
-    res = NextResponse.rewrite(newUrl);
+    res = NextResponse.rewrite(newUrl, {
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
   return res;

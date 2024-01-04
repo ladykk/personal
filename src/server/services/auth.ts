@@ -46,9 +46,12 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     redirect: ({ url, baseUrl }) => {
-      const hostname = new URL(baseUrl).hostname.replace("www.", "");
-      // If callbackUrl is not the same domain as the site, redirect to baseUrl
-      if (!hostname.endsWith(env.ROOT_DOMAIN)) return baseUrl;
+      const isDev = env.VERCEL_ENV === "development";
+      if (isDev) return url;
+
+      const hostname = new URL(url).hostname.replace("www.", "");
+      // If callbackUrl is not the same domain as the site, redirect to url
+      if (!hostname.endsWith(env.ROOT_DOMAIN)) return url;
 
       // If callbackUrl subdomain is not in the list of valid applications, redirect to baseUrl
       const subdomain = hostname
