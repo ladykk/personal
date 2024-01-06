@@ -10,7 +10,9 @@ export default function TimesheetDashboardLayout(
   return (
     <div className="min-h-svh flex flex-col">
       <Navbar ROOT_DOMAIN={env.ROOT_DOMAIN} />
-      <SidebarWrapper>{props.children}</SidebarWrapper>
+      <SidebarWrapper ROOT_DOMAIN={env.ROOT_DOMAIN}>
+        {props.children}
+      </SidebarWrapper>
     </div>
   );
 }

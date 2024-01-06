@@ -15,6 +15,16 @@ export function BackLink() {
   );
 }
 
+export function BackButton() {
+  const router = useRouter();
+
+  return (
+    <Button variant="outline" size="icon" onClick={() => router.back()}>
+      <ChevronLeft />
+    </Button>
+  );
+}
+
 export function HomePageLink() {
   return (
     <Link href={window.location.origin} className={buttonVariants()}>
