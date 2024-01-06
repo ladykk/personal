@@ -10,9 +10,9 @@ export const files = pgTable("file", {
     mode: "number",
   }).notNull(),
   issuedAt: timestamp("expires_at", { mode: "date" }).notNull(),
-  issuedBy: text("issued_by")
-    .notNull()
-    .references(() => users.id),
+  issuedBy: text("issued_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
   uploadedAt: timestamp("uploaded_at", { mode: "date" }),
   readAccessControl: json("read_access_control")
     .notNull()

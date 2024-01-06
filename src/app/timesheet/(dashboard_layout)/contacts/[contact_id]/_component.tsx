@@ -1,15 +1,11 @@
 "use client";
-import { MainContainer, PageHeader } from "@/components/themes/timesheet";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { ComboBox } from "@/components/ui/combo-box";
+import { ImportContactFromVATService } from "@/components/rd-api/vat";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  FormContainer,
+  MainContainer,
+  PageHeader,
+} from "@/components/themes/timesheet";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -19,244 +15,302 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { VATResultToContact } from "@/lib/rd-api";
-import { cn } from "@/lib/utils";
+import { getAppUrl } from "@/lib/url";
+import { handleTRPCFormError } from "@/lib/utils";
 import { trpc } from "@/trpc/client";
 import { RouterInputs, RouterOutputs } from "@/trpc/shared";
-import { Download } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import { Save } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export function TimesheetContactFormClient() {
+type TimesheetContactFormClientProps = {
+  ROOT_DOMAIN: string;
+  contactId: number;
+  initialData: RouterOutputs["timesheet"]["contact"]["getContact"];
+};
+export function TimesheetContactFormClient(
+  props: TimesheetContactFormClientProps
+) {
+  const router = useRouter();
+  const submitBtn = useRef<HTMLButtonElement>(null);
+
+  const form = useForm<
+    RouterInputs["timesheet"]["contact"]["createOrUpdateContact"]
+  >({
+    defaultValues: props.initialData,
+  });
+  const mutation = trpc.timesheet.contact.createOrUpdateContact.useMutation({
+    onSuccess: (data, variables) => {
+      if (props.contactId === 0)
+        router.replace(
+          getAppUrl(props.ROOT_DOMAIN, "timesheet", `/contacts/${data}`)
+        );
+      else {
+        form.reset(variables);
+      }
+    },
+
+    onError: (error) =>
+      handleTRPCFormError(error.data?.zodError, form.setError),
+  });
+
   return (
-    <MainContainer>
+    <MainContainer className="space-y-5">
       <PageHeader
-        title={"Add Contact"}
+        title={props.contactId === 0 ? "Add Contact" : "Edit Contact"}
         backButton
         actions={
-          <>
-            <ImportFromVatService onImport={() => {}} />
-          </>
+          <div className="flex items-center gap-3">
+            {props.contactId === 0 && (
+              <ImportContactFromVATService
+                onImport={(vat) => {
+                  form.reset();
+                  form.setValue("companyName", vat.companyName, {
+                    shouldDirty: true,
+                  });
+                  form.setValue("contactPerson", vat.name, {
+                    shouldDirty: true,
+                  });
+                  form.setValue("address", vat.address, {
+                    shouldDirty: true,
+                  });
+                  form.setValue("taxId", vat.tid, {
+                    shouldDirty: true,
+                  });
+                  form.setValue("isHeadQuarters", vat.isHeadQuarter, {
+                    shouldDirty: true,
+                  });
+                  toast.info("Contact information imported!");
+                }}
+              />
+            )}
+            <Button
+              type="button"
+              disabled={!form.formState.isDirty}
+              loading={mutation.isLoading}
+              size="icon"
+              onClick={submitBtn.current?.click.bind(submitBtn.current)}
+            >
+              <Save />
+            </Button>
+          </div>
         }
       />
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit((data) =>
+            toast.promise(mutation.mutateAsync(data), {
+              loading: "Saving contact information...",
+              success: "Contact information saved!",
+              error: "Contact information could not be saved!",
+            })
+          )}
+        >
+          <FormContainer className="flex gap-3 flex-col-reverse md:flex-row md:gap-5">
+            <div className="space-y-3 flex-1">
+              <FormField
+                control={form.control}
+                name="taxId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tax ID</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="companyName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel required>Company Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex gap-3 items-center">
+                <FormField
+                  control={form.control}
+                  name="isHeadQuarters"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="flex gap-3 items-center h-10">
+                          <Switch {...field} />
+                          <FormLabel>Is Head Quaters</FormLabel>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="flex gap-3 items-center h-10">
+                          <Switch {...field} />
+                          <FormLabel>Active</FormLabel>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="branchCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Branch Code</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="telNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tel No.</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phoneNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone No.</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="faxNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fax No.</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="hidden md:block">
+              <Separator orientation="vertical" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <FormField
+                control={form.control}
+                name="contactPerson"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel required>Contact Person</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="contactEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="contactPhoneNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Phone No.</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="remark"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Remark</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} className="min-h-[150px]" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <button type="submit" ref={submitBtn} hidden />
+          </FormContainer>
+        </form>
+      </Form>
     </MainContainer>
-  );
-}
-
-type ImportFromVatServiceProps = {
-  onImport: (data: ReturnType<typeof VATResultToContact>) => void;
-};
-export function ImportFromVatService(props: ImportFromVatServiceProps) {
-  const [open, setOpen] = useState(false);
-  const [result, setResult] = useState<ReturnType<
-    typeof VATResultToContact
-  > | null>(null);
-  const commonService = trpc.rdAPI.getVatCommonService.useQuery(undefined, {
-    enabled: open,
-  });
-
-  console.log(result);
-
-  const form = useForm<RouterInputs["rdAPI"]["getVatService"]>();
-  const [provinceCode] = form.watch(["provinceCode"]);
-  const amphers = commonService.data?.find(
-    (province) => province.ProvinceCode === provinceCode
-  )?.Amphurs;
-
-  const mutation = trpc.rdAPI.getVatService.useMutation({
-    onSuccess: (data, variables) => {
-      setResult(VATResultToContact(data));
-      form.reset();
-    },
-  });
-
-  return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Download />
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="max-w-xl">
-        <SheetHeader className="mb-3">
-          <SheetTitle>Import Contact From RD</SheetTitle>
-          <SheetDescription>
-            Using VAT Service API to import contact information by Tax ID.{" "}
-            <Link
-              href="https://www.rd.go.th/42535.html"
-              target="_blank"
-              className={cn(buttonVariants({ variant: "link", size: "fit" }))}
-            >
-              (More detail)
-            </Link>
-          </SheetDescription>
-        </SheetHeader>
-        {result ? (
-          <div>
-            <div className="border rounded-md p-3 space-y-3">
-              <FormItem>
-                <Label>Tax ID</Label>
-                <Input readOnly value={result.tid} />
-              </FormItem>
-              <FormItem>
-                <Label>Contact Name</Label>
-                <Input readOnly value={result.name} />
-              </FormItem>
-              <FormItem>
-                <Label>Company</Label>
-                <Input readOnly value={result.companyName} />
-              </FormItem>
-              <FormItem>
-                <Label>Address</Label>
-                <Textarea readOnly value={result.address} />
-              </FormItem>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-3">
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  setResult(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  props.onImport(result);
-                  setResult(null);
-                  setOpen(false);
-                }}
-              >
-                Import
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="border rounded-md p-3">
-            <Form {...form}>
-              <form
-                className="grid gap-3"
-                onSubmit={form.handleSubmit(async (data) => {
-                  toast.promise(mutation.mutateAsync(data), {
-                    loading: "Looking up contact information...",
-                    success: "Contact information found!",
-                    error: "Contact information not found!",
-                  });
-                })}
-              >
-                <FormField
-                  control={form.control}
-                  name="tin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-baseline">
-                        <FormLabel>Tax ID</FormLabel>
-                        <FormMessage />
-                      </div>
-                      <FormControl>
-                        <Input {...field} placeholder="Number 13 Digits" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <div className="flex items-baseline">
-                        <FormLabel>Name</FormLabel>
-                        <FormMessage />
-                      </div>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="e.g. บริษัท สเฟียร์ซอฟต์ จำกัด"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="provinceCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-baseline">
-                        <FormLabel>Province</FormLabel>
-                        <FormMessage />
-                      </div>
-                      <FormControl>
-                        <ComboBox
-                          {...field}
-                          onChange={(value) => {
-                            form.setValue("amphurCode", undefined);
-                            field.onChange(value);
-                          }}
-                          options={commonService.data}
-                          setLabel={(province) => province.ProvinceName}
-                          setValue={(province) => province.ProvinceCode}
-                          loading={commonService.isLoading}
-                          placeholder="Select a province..."
-                          clearable
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="amphurCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-baseline">
-                        <FormLabel>Amphur</FormLabel>
-                        <FormMessage />
-                      </div>
-                      <FormControl>
-                        <ComboBox
-                          {...field}
-                          options={amphers}
-                          setLabel={(ampher) => ampher.AmphurName}
-                          setValue={(ampher) => ampher.AmphurCode}
-                          disabled={!provinceCode}
-                          loading={commonService.isLoading}
-                          placeholder={
-                            !provinceCode
-                              ? "Select a province first..."
-                              : "Select an amphur..."
-                          }
-                          clearable
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  loading={mutation.isLoading}
-                  disabled={!form.formState.isDirty}
-                >
-                  Search
-                </Button>
-              </form>
-            </Form>
-          </div>
-        )}
-      </SheetContent>
-    </Sheet>
   );
 }

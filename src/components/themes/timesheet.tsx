@@ -158,3 +158,18 @@ export function PageHeader(props: {
     </div>
   );
 }
+
+export function FormContainer(
+  props: JSX.IntrinsicAttributes &
+    ClassAttributes<HTMLDivElement> &
+    HTMLAttributes<HTMLDivElement>
+) {
+  return (
+    <div
+      {...props}
+      className={cn("p-5 bg-background rounded-md border", props.className)}
+    >
+      {props.children}
+    </div>
+  );
+}

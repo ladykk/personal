@@ -122,13 +122,21 @@ export const generatePresignedUrl = async (
   return result[0].key;
 };
 
-export const deleteFileByUrl = async (url: string) => {
+export const getIdFromUrl = (url: string | undefined | null) => {
+  if (!url) return null;
   const baseStorageUrl = getAppUrl(env.ROOT_DOMAIN, "storage", "/file");
 
   // Skip if the url is not a storage url
-  if (!url.startsWith(baseStorageUrl)) return;
+  if (!url.startsWith(baseStorageUrl)) return null;
 
   const key = url.replace(baseStorageUrl, "");
+  return key;
+};
+
+export const deleteFileByUrl = async (url: string) => {
+  const key = getIdFromUrl(url);
+
+  if (!key) return;
 
   // Get file from database
   const file = await db.query.files

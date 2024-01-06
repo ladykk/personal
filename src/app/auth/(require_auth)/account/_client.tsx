@@ -11,7 +11,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { FileInput, Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { fileToPresignedUrlInput, uploadFile } from "@/lib/r2";
 import { getAppUrl } from "@/lib/url";
 import { getNamePrefix } from "@/lib/utils";

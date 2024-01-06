@@ -51,7 +51,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       >
-        {loading && <Spinner className="mr-2 w-4 h-4" />}
+        {loading && !["fit", "icon"].includes(size ?? "") && (
+          <Spinner className="mr-2 w-4 h-4" />
+        )}
         {props.children}
       </Comp>
     );

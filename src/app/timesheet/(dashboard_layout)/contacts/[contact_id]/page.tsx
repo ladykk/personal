@@ -1,18 +1,33 @@
 import { notFound } from "next/navigation";
 import { TimesheetContactFormClient } from "./_component";
+import { env } from "@/env";
+import { trpc } from "@/trpc/server";
+import { RouterOutputs } from "@/trpc/shared";
+import { contactSchema } from "@/server/routers/timesheet/contact";
 
 type TimesheetContactFormPageProps = {
   params: {
     contact_id: string;
   };
 };
-export default function TimesheetContactFormPage(
+export default async function TimesheetContactFormPage(
   props: TimesheetContactFormPageProps
 ) {
-  const contact_id =
+  const contactId =
     props.params.contact_id === "add" ? 0 : Number(props.params.contact_id);
 
-  if (Number.isNaN(contact_id)) notFound();
+  if (Number.isNaN(contactId)) notFound();
 
-  return <TimesheetContactFormClient />;
+  const initialData: RouterOutputs["timesheet"]["contact"]["getContact"] =
+    contactId === 0
+      ? contactSchema.parse({})
+      : await trpc.timesheet.contact.getContact.query(contactId);
+
+  return (
+    <TimesheetContactFormClient
+      ROOT_DOMAIN={env.ROOT_DOMAIN}
+      contactId={contactId}
+      initialData={initialData}
+    />
+  );
 }
