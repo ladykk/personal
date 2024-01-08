@@ -124,7 +124,7 @@ export const generatePresignedUrl = async (
 
 export const getIdFromUrl = (url: string | undefined | null) => {
   if (!url) return null;
-  const baseStorageUrl = getAppUrl(env.ROOT_DOMAIN, "storage", "/file");
+  const baseStorageUrl = getAppUrl(env.ROOT_DOMAIN, "storage", "/file/");
 
   // Skip if the url is not a storage url
   if (!url.startsWith(baseStorageUrl)) return null;
@@ -133,20 +133,16 @@ export const getIdFromUrl = (url: string | undefined | null) => {
   return key;
 };
 
-export const deleteFileByUrl = async (url: string) => {
-  const key = getIdFromUrl(url);
-
-  if (!key) return;
-
+export const deleteFileById = async (id: string) => {
   // Get file from database
   const file = await db.query.files
     .findFirst({
-      where: ({ id }, { eq }) => eq(id, key),
+      where: ({ id: key }, { eq }) => eq(key, id),
     })
     .execute();
 
   if (!file) {
-    console.info(`[R2]: File not found in DB. Skip delete. ${key}`);
+    console.info(`[R2]: File not found in DB. Skip delete. ${id}`);
     return;
   }
 
@@ -171,7 +167,7 @@ export const deleteFileByUrl = async (url: string) => {
 
   // If file not found, return 404
   if (!result) {
-    console.info(`[R2]: File not found in R2. ${key}`);
+    console.info(`[R2]: File not found in R2. ${id}`);
   }
 
   // Delete file from database
@@ -179,4 +175,15 @@ export const deleteFileByUrl = async (url: string) => {
 
   // Return success
   return;
+};
+
+export const deleteFileByUrl = async (url: string) => {
+  const key = getIdFromUrl(url);
+
+  if (!key) {
+    console.info(`[R2]: Invalid url. Skip delete. ${url}`);
+    return;
+  }
+
+  await deleteFileById(key);
 };

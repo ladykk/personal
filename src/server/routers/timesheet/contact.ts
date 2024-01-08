@@ -4,7 +4,12 @@ import { createTRPCRouter, protectedProcedure } from "@/server";
 import { DB } from "@/server/db";
 import { timesheetContacts } from "@/server/db/schema/timesheet";
 import { paginationInput, paginationOutput } from "@/server/services/api";
-import { getIdFromUrl } from "@/server/services/r2";
+import {
+  deleteFileById,
+  generatePresignedUrl,
+  generatePresignedUrlInputSchema,
+  getIdFromUrl,
+} from "@/server/services/r2";
 import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -41,13 +46,6 @@ const contactFormSchema = contactSchema
     contactPerson: z.string().min(1, {
       message: "Required",
     }),
-  })
-  .superRefine((data) => {
-    const { avatarUrl, ...rest } = data;
-    return {
-      ...rest,
-      avatarId: getIdFromUrl(avatarUrl),
-    };
   });
 
 const getContactBaseQuery = (db: DB) =>
@@ -159,9 +157,10 @@ export const timesheetContactRouter = createTRPCRouter({
       return await ctx.db.transaction(async (trx) => {
         if (id) {
           // Find existing contact
-          const existing = await trx
+          const contact = await trx
             .select({
               id: timesheetContacts.id,
+              avatarId: timesheetContacts.avatarId,
             })
             .from(timesheetContacts)
             .where(
@@ -173,10 +172,16 @@ export const timesheetContactRouter = createTRPCRouter({
             .limit(1)
             .execute();
 
-          if (existing.length === 0)
+          if (contact.length === 0)
             throw new TRPCError({
               code: "NOT_FOUND",
             });
+
+          if (
+            contact[0].avatarId &&
+            contact[0].avatarId !== getIdFromUrl(avatarUrl)
+          )
+            await deleteFileById(contact[0].avatarId);
 
           // Update existing contact
           await trx
@@ -184,6 +189,7 @@ export const timesheetContactRouter = createTRPCRouter({
             .set({
               ...data,
               id,
+              avatarId: getIdFromUrl(avatarUrl),
               updatedBy: ctx.session.user.id,
               updatedAt: new Date(),
             })
@@ -212,5 +218,38 @@ export const timesheetContactRouter = createTRPCRouter({
           return result[0].id;
         }
       });
+    }),
+  generateAvatarPresignedUrl: protectedProcedure
+    .input(
+      generatePresignedUrlInputSchema.extend({
+        contactId: z.number(),
+      })
+    )
+    .output(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const { contactId, ...rest } = input;
+
+      // Check if contact exists
+      const contact = await getContactBaseQuery(ctx.db)
+        .where(
+          and(
+            eq(timesheetContacts.id, contactId),
+            eq(timesheetContacts.createdBy, ctx.session.user.id)
+          )
+        )
+        .limit(1)
+        .execute();
+
+      if (contact.length === 0) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return await generatePresignedUrl(
+        ctx.session.user.id,
+        { rule: "self", selfUserId: ctx.session.user.id },
+        {
+          rule: "self",
+          selfUserId: ctx.session.user.id,
+        },
+        rest
+      );
     }),
 });

@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
 export function getNamePrefix(name: string | null | undefined) {
   if (!name) return "L";
 
-  const filtered = name.replace(/[^a-zA-Z]/g, "");
+  const filtered = name.replace(/[^a-zA-Zก-๙]/g, "");
   return filtered.charAt(0).toUpperCase();
 }
 

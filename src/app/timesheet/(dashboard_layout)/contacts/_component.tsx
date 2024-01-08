@@ -1,9 +1,11 @@
 "use client";
 import { MainContainer, PageHeader } from "@/components/themes/timesheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
 import { DataTable, DataTablePagination } from "@/components/ui/data-table";
 import { useSearchParamsState } from "@/hooks/search-params";
 import { getAppUrl } from "@/lib/url";
+import { getNamePrefix } from "@/lib/utils";
 import { trpc } from "@/trpc/client";
 import { RouterInputs, RouterOutputs } from "@/trpc/shared";
 import { Mail, Phone, Plus, Printer, Smartphone } from "lucide-react";
@@ -46,6 +48,21 @@ export function TimesheetContactClient(props: TimesheetContactClientProps) {
         data={query.data.list}
         className="mb-3"
         columns={[
+          {
+            header: "Avatar",
+            accessorKey: "avatarUrl",
+            cell: ({ row }) => (
+              <Avatar className="w-16 h-16">
+                <AvatarImage
+                  src={row.original.avatarUrl}
+                  alt={row.original.companyName}
+                />
+                <AvatarFallback>
+                  {getNamePrefix(row.original.companyName)}
+                </AvatarFallback>
+              </Avatar>
+            ),
+          },
           {
             header: "Tax Id",
             accessorKey: "taxId",

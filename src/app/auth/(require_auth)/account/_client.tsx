@@ -54,7 +54,7 @@ export default function AuthAccountClient(props: Props) {
       image: profile.data?.image ?? undefined,
     },
   });
-  const [name, image] = profileForm.watch(["name", "image"]);
+  const name = profileForm.watch("name");
 
   return (
     <AuthContainer className=" max-w-xl">
