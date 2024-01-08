@@ -29,7 +29,31 @@ export const timesheetContacts = pgTable("contact", {
   contactPerson: text("contact_person").notNull(),
   contactEmail: text("contact_email").notNull().default(""),
   contactPhoneNo: text("contact_phone_no").notNull().default(""),
-  // Remark,
+  // Remark
+  remark: text("remark").notNull().default(""),
+  // Metadata
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().default(new Date()),
+  createdBy: text("created_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  updatedAt: timestamp("updated_at"),
+  updatedBy: text("updated_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
+});
+
+export const timesheetProjects = pgTable("project", {
+  id: serial("id").primaryKey(),
+  // Project Info
+  iconId: text("icon_id").references(() => files.id, {
+    onDelete: "set null",
+  }),
+  name: text("name").notNull(),
+  contactId: text("contact_id").references(() => timesheetContacts.id, {
+    onDelete: "restrict",
+  }),
+  // Remark
   remark: text("remark").notNull().default(""),
   // Metadata
   isActive: boolean("is_active").notNull().default(true),
