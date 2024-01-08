@@ -24,7 +24,7 @@ import { trpc } from "@/trpc/client";
 import { RouterInputs, RouterOutputs } from "@/trpc/shared";
 import { Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 

@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "@/hooks/search-params";
+import { useSearchParamsState } from "@/hooks/search-params";
 import { OAuthTheme, SignInError, AuthSignInErrorCode } from "@/static/auth";
 import { ClientSafeProvider, signIn } from "next-auth/react";
 import Image from "next/image";
@@ -49,7 +49,7 @@ export function OAuthSignIn(props: Props) {
 }
 
 export function ErrorHandle() {
-  const searchParams = useSearchParams({
+  const searchParams = useSearchParamsState({
     error: "" as AuthSignInErrorCode,
   });
 

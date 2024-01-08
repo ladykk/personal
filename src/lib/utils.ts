@@ -20,7 +20,6 @@ export function handleTRPCFormError<T extends FieldValues>(
   setError: UseFormSetError<T>
 ) {
   Object.entries(error?.fieldErrors ?? {}).forEach(([key, value]) => {
-    console.log(key, value);
     setError(key as Path<T>, {
       type: "manual",
       message: (value as string[]).join(","),

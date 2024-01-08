@@ -9,9 +9,9 @@ type TSearchParamsDefaultValues<Key extends string> = {
   [key in Key]: TSearchParamsAcceptableValues;
 };
 
-export function useSearchParams<
+export function useSearchParamsState<
   Key extends string,
-  Schema extends TSearchParamsDefaultValues<Key>
+  Schema extends TSearchParamsDefaultValues<Key>,
 >(defaultValues: Schema) {
   const router = useRouter();
   const pathName = usePathname();

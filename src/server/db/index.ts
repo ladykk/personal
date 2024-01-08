@@ -7,3 +7,4 @@ const sql = postgres(env.NEON_DATABASE_URL);
 export const db = drizzle(sql, {
   schema,
 });
+export type DB = typeof db;

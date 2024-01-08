@@ -65,7 +65,7 @@ export class R2 {
         .promise();
       return key;
     } catch (err) {
-      console.log(`[R2]: Failed to upload object. ${err}`);
+      console.error(`[R2]: Failed to upload object. ${err}`);
       return null;
     }
   }
@@ -82,7 +82,7 @@ export const checkAccessControl = async (accessControl: TAccessControl) => {
       if (session.user.id === accessControl.selfUserId) return true;
       return false;
     default:
-      console.log(`[R2]: Not implemented access control rule. ${unknownRule}`);
+      console.warn(`[R2]: Not implemented access control rule. ${unknownRule}`);
       return false;
   }
 };
@@ -146,7 +146,7 @@ export const deleteFileByUrl = async (url: string) => {
     .execute();
 
   if (!file) {
-    console.log(`[R2]: File not found in DB. Skip delete. ${key}`);
+    console.info(`[R2]: File not found in DB. Skip delete. ${key}`);
     return;
   }
 
@@ -171,7 +171,7 @@ export const deleteFileByUrl = async (url: string) => {
 
   // If file not found, return 404
   if (!result) {
-    console.log(`[R2]: File not found in R2. ${key}`);
+    console.info(`[R2]: File not found in R2. ${key}`);
   }
 
   // Delete file from database

@@ -12,13 +12,14 @@ import { BookUser, LucideIcon, Menu, X } from "lucide-react";
 import { JSX, ClassAttributes, HTMLAttributes } from "react";
 import { usePathname } from "next/navigation";
 import { BackButton } from "../common/links";
+import { Spinner } from "../ui/spinner";
 
 type NavbarProps = {
   ROOT_DOMAIN: string;
 };
 export function Navbar(props: NavbarProps) {
   return (
-    <div className="fixed top-0 left-0 right-0 bg-background h-14 z-50 flex items-center justify-between px-2 border-b">
+    <div className="fixed top-0 left-0 right-0 bg-background h-14 z-40 flex items-center justify-between px-2 border-b">
       <div className="flex items-center gap-2">
         <SidebarControl />
         <Link
@@ -98,7 +99,7 @@ export function SidebarWrapper(props: SidebarWrapperProps) {
     <div className="flex-1 flex relative pt-[3.5rem] overflow-x-clip">
       <div
         className={cn(
-          "w-full max-w-[300px] fixed top-[3.5rem] left-0 bottom-0 bg-background border-r transition-transform xl:translate-x-0 z-40 p-3",
+          "w-full max-w-[300px] fixed top-[3.5rem] left-0 bottom-0 bg-background border-r transition-transform xl:translate-x-0 z-30 p-3",
           !isOpen && "-translate-x-[301px]"
         )}
       >
@@ -148,11 +149,18 @@ export function PageHeader(props: {
   title: string;
   backButton?: boolean;
   actions?: React.ReactNode;
+  className?: string;
+  loading?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3">
+    <div
+      className={cn("flex items-center justify-between gap-3", props.className)}
+    >
       {props.backButton && <BackButton />}
-      <h1 className="text-3xl font-semibold py-3">{props.title}</h1>
+      <h1 className="text-3xl font-semibold py-3 inline-flex items-baseline gap-3">
+        {props.title}
+        {props.loading && <Spinner />}
+      </h1>
       <div className="flex-1" />
       {props.actions}
     </div>
@@ -171,5 +179,13 @@ export function FormContainer(
     >
       {props.children}
     </div>
+  );
+}
+
+export function Loading() {
+  return (
+    <MainContainer className="h-full flex items-center justify-center bg-black/30">
+      <Spinner className="w-14 h-14" />
+    </MainContainer>
   );
 }
