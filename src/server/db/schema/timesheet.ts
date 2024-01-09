@@ -1,5 +1,6 @@
 import {
   boolean,
+  integer,
   pgTableCreator,
   serial,
   text,
@@ -50,7 +51,7 @@ export const timesheetProjects = pgTable("project", {
     onDelete: "set null",
   }),
   name: text("name").notNull(),
-  contactId: text("contact_id").references(() => timesheetContacts.id, {
+  contactId: integer("contact_id").references(() => timesheetContacts.id, {
     onDelete: "restrict",
   }),
   // Remark

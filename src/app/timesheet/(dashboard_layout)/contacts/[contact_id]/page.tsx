@@ -3,7 +3,7 @@ import { TimesheetContactFormClient } from "./_component";
 import { env } from "@/env";
 import { trpc } from "@/trpc/server";
 import { RouterOutputs } from "@/trpc/shared";
-import { contactSchema } from "@/server/routers/timesheet/contact";
+import Contact from "@/server/models/timesheet/contact";
 
 type TimesheetContactFormPageProps = {
   params: {
@@ -20,7 +20,7 @@ export default async function TimesheetContactFormPage(
 
   const initialData: RouterOutputs["timesheet"]["contact"]["getContact"] =
     contactId === 0
-      ? contactSchema.parse({})
+      ? Contact.schemas.base.parse({})
       : await trpc.timesheet.contact.getContact.query(contactId);
 
   return (

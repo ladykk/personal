@@ -8,7 +8,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { getAppUrl } from "@/lib/url";
 import { create } from "zustand";
-import { BookUser, LucideIcon, Menu, X } from "lucide-react";
+import { BookUser, FolderKanban, LucideIcon, Menu, X } from "lucide-react";
 import { JSX, ClassAttributes, HTMLAttributes } from "react";
 import { usePathname } from "next/navigation";
 import { BackButton } from "../common/links";
@@ -86,6 +86,11 @@ type SidebarItem = {
   icon: LucideIcon;
 };
 const SIDEBAR_ITEMS: SidebarItem[] = [
+  {
+    label: "Projects",
+    href: "projects",
+    icon: FolderKanban,
+  },
   {
     label: "Contacts",
     href: "contacts",

@@ -10,4 +10,6 @@ const schema = {
   ...timesheet,
 };
 
+export type TDBSchema = typeof schema;
+
 export default schema;
