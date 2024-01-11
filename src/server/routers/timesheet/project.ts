@@ -10,8 +10,61 @@ import {
   generatePresignedUrlInputSchema,
   getIdFromUrl,
 } from "@/server/services/r2";
+import { paginationInput, paginationOutput } from "@/server/services/api";
 
 export const timesheetProjectRouter = createTRPCRouter({
+  getPaginateProjects: protectedProcedure
+    .input(paginationInput({}))
+    .output(paginationOutput(Project.schemas.base))
+    .query(async ({ input, ctx }) => {
+      const { page, itemsPerPage } = input;
+
+      const whereClause = and(
+        eq(timesheetProjects.createdBy, ctx.session.user.id)
+      );
+
+      const count = await Project.queries
+        .count(ctx.db)
+        .where(whereClause)
+        .execute();
+
+      const result = await Project.queries
+        .base(ctx.db)
+        .where(whereClause)
+        .offset((page - 1) * itemsPerPage)
+        .limit(itemsPerPage)
+        .execute();
+
+      return {
+        count: count[0].count,
+        currentPage: page,
+        itemsPerPage,
+        totalPages: Math.ceil(count[0].count / itemsPerPage),
+        list: result.map(Project.postFormat.base),
+      };
+    }),
+  getProject: protectedProcedure
+    .input(Model.schemas.integerId)
+    .output(Project.schemas.base)
+    .query(async ({ input, ctx }) => {
+      const result = await Project.queries
+        .base(ctx.db)
+        .where(
+          and(
+            eq(timesheetProjects.id, input),
+            eq(timesheetProjects.createdBy, ctx.session.user.id)
+          )
+        )
+        .limit(1)
+        .execute();
+
+      if (result.length === 0)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+        });
+
+      return result.map(Project.postFormat.base)[0];
+    }),
   createOrUpdateContact: protectedProcedure
     .input(Project.schemas.form)
     .output(Model.schemas.integerId)

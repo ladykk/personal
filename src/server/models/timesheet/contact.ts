@@ -2,11 +2,10 @@ import { env } from "@/env";
 import { getAppUrl } from "@/lib/url";
 import { type DB } from "@/server/db";
 import { timesheetContacts } from "@/server/db/schema/timesheet";
-import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import Model from "..";
 
-const schema = z.object({
+const baseSchema = z.object({
   id: z.number().default(0),
   avatarUrl: z.string().nullish().default(null),
   taxId: z.string().default(""),
@@ -27,7 +26,7 @@ const schema = z.object({
   updatedAt: z.date().nullish(),
 });
 
-const formSchema = schema
+const formSchema = baseSchema
   .omit({
     createdAt: true,
     updatedAt: true,
@@ -42,7 +41,9 @@ const formSchema = schema
   });
 
 const filterSchema = {
+  searchKeyword: z.string().optional(),
   isActive: z.boolean().optional(),
+  isHeadQuarters: z.boolean().optional(),
 };
 
 const idSchema = z.number().min(1, {
@@ -79,17 +80,27 @@ type BaseContactResult = Awaited<
 const countQuery = (db: DB) =>
   db.select(Model.selects.count(timesheetContacts.id)).from(timesheetContacts);
 
-const basePostFormat = (array: BaseContactResult) =>
-  array.map((item) => ({
-    ...item,
-    avatarUrl: item.avatarId
-      ? getAppUrl(env.ROOT_DOMAIN, "storage", `/file/${item.avatarId}`)
-      : null,
-  }));
+const basePostFormat = (
+  item: BaseContactResult[0]
+): z.infer<typeof baseSchema> => ({
+  ...item,
+  avatarUrl: item.avatarId
+    ? getAppUrl(env.ROOT_DOMAIN, "storage", `/file/${item.avatarId}`)
+    : null,
+});
+
+const formPostFormat = (
+  item: z.infer<typeof baseSchema>
+): z.infer<typeof formSchema> => ({
+  ...item,
+});
+
+const keywordPostFormat = (item: z.infer<typeof baseSchema>) =>
+  `${item.companyName} ${item.contactPerson} ${item.email} ${item.telNo} ${item.phoneNo} ${item.faxNo} ${item.contactEmail} ${item.contactPhoneNo}`;
 
 const Contact = {
   schemas: {
-    base: schema,
+    base: baseSchema,
     form: formSchema,
     filters: filterSchema,
     id: idSchema,
@@ -103,6 +114,8 @@ const Contact = {
   },
   postFormat: {
     base: basePostFormat,
+    form: formPostFormat,
+    keyword: keywordPostFormat,
   },
 };
 

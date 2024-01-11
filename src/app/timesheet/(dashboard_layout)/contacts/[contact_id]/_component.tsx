@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { fileToPresignedUrlInput, uploadFile } from "@/lib/r2";
 import { getAppUrl } from "@/lib/url";
 import { getNamePrefix, handleTRPCFormError } from "@/lib/utils";
+import Contact from "@/server/models/timesheet/contact";
 import { trpc } from "@/trpc/client";
 import { RouterInputs, RouterOutputs } from "@/trpc/shared";
 import { Save } from "lucide-react";
@@ -56,7 +57,7 @@ export function TimesheetContactFormClient(
     initialData: props.initialData,
   });
   const mutation = trpc.timesheet.contact.createOrUpdateContact.useMutation({
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       if (props.contactId === 0)
         router.replace(
           getAppUrl(props.ROOT_DOMAIN, "timesheet", `/contacts/${data}`)
@@ -72,7 +73,9 @@ export function TimesheetContactFormClient(
 
   useEffect(() => {
     if (query.data) {
-      form.reset(query.data);
+      form.reset(Contact.postFormat.form(query.data), {
+        keepDirty: true,
+      });
     }
   }, [query.data]);
 
@@ -131,11 +134,7 @@ export function TimesheetContactFormClient(
                     contactId: props.contactId,
                   });
                   // Upload the image to S3
-                  const imageResult = await uploadFile(
-                    data.files.avatar,
-                    key,
-                    props.ROOT_DOMAIN
-                  );
+                  const imageResult = await uploadFile(data.files.avatar, key);
 
                   if (imageResult.status === "error") {
                     form.setError("files.avatar", {
@@ -161,7 +160,100 @@ export function TimesheetContactFormClient(
             )
           )}
         >
-          <FormContainer className="flex gap-3 flex-col-reverse md:flex-row md:gap-5">
+          <FormContainer className="flex gap-3 flex-col md:flex-row md:gap-5">
+            <div className="flex-1 space-y-3">
+              <FormField
+                name="files.avatar"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Avatar
+                      {props.contactId === 0 && (
+                        <span className="ml-1 font-medium text-destructive">
+                          (available after created)
+                        </span>
+                      )}
+                    </FormLabel>
+                    <div className="flex gap-3 items-center">
+                      <Avatar className="w-20 h-20">
+                        <AvatarImage
+                          src={
+                            field.value
+                              ? URL.createObjectURL(field.value)
+                              : query.data.avatarUrl
+                          }
+                          alt={companyName}
+                        />
+                        <AvatarFallback>
+                          {getNamePrefix(companyName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <FormControl>
+                        <FileInput {...field} clearable />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+                disabled={props.contactId === 0}
+              />
+              <FormField
+                control={form.control}
+                name="contactPerson"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel required>Contact Person</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="contactEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="contactPhoneNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Phone No.</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="remark"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Remark</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} className="min-h-[150px]" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="hidden md:block">
+              <Separator orientation="vertical" />
+            </div>
             <div className="space-y-3 flex-1">
               <FormField
                 control={form.control}
@@ -294,91 +386,6 @@ export function TimesheetContactFormClient(
                     <FormLabel>Fax No.</FormLabel>
                     <FormControl>
                       <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="hidden md:block">
-              <Separator orientation="vertical" />
-            </div>
-            <div className="flex-1 space-y-3">
-              <FormField
-                name="files.avatar"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Avatar</FormLabel>
-                    <div className="flex gap-3 items-center">
-                      <Avatar className="w-20 h-20">
-                        <AvatarImage
-                          src={
-                            field.value
-                              ? URL.createObjectURL(field.value)
-                              : props.initialData.avatarUrl
-                          }
-                          alt={companyName}
-                        />
-                        <AvatarFallback>
-                          {getNamePrefix(companyName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <FormControl>
-                        <FileInput {...field} clearable />
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contactPerson"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>Contact Person</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contactEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contact Email</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contactPhoneNo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contact Phone No.</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="remark"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Remark</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} className="min-h-[150px]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -1,8 +1,16 @@
 import { ZodObject, ZodRawShape, z } from "zod";
 
-export const paginationInput = <T extends ZodRawShape>(filters: T) =>
+export const baseInput = <T extends ZodRawShape>(options: T) =>
   z.object({
-    ...filters,
+    ...options,
+  });
+
+export const arrayOutput = <T extends ZodRawShape>(data: ZodObject<T>) =>
+  z.array(data);
+
+export const paginationInput = <T extends ZodRawShape>(options: T) =>
+  baseInput({
+    ...options,
     page: z.coerce.number().min(1).default(1),
     itemsPerPage: z.coerce.number().min(1).default(10),
   });

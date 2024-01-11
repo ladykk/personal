@@ -7,12 +7,15 @@ import {
   timesheetProjects,
 } from "@/server/db/schema/timesheet";
 import Model from "..";
+import { getAppUrl } from "@/lib/url";
+import { env } from "@/env";
 
 const baseSchema = z.object({
   id: z.number().default(0),
   iconUrl: z.string().nullish().default(null),
   name: z.string().default(""),
-  contact: Contact.schemas.base,
+  description: z.string().default(""),
+  contact: Contact.schemas.base.nullish().default(null),
   remark: z.string().default(""),
   isActive: z.boolean().default(true),
   createdAt: z.date().default(new Date()),
@@ -27,7 +30,7 @@ const formSchema = baseSchema
   })
   .extend({
     name: z.string().min(1, {
-      message: "Invalid contact",
+      message: "Required",
     }),
     contactId: Contact.schemas.id,
   });
@@ -63,6 +66,7 @@ const baseQuery = (db: DB) =>
       id: timesheetProjects.id,
       iconId: timesheetProjects.iconId,
       name: timesheetProjects.name,
+      description: timesheetProjects.description,
       contact: Contact.selects.base,
       remark: timesheetProjects.remark,
       isActive: timesheetProjects.isActive,
@@ -75,8 +79,29 @@ const baseQuery = (db: DB) =>
       eq(timesheetProjects.contactId, timesheetContacts.id)
     );
 
+type BaseProjectResult = Awaited<
+  ReturnType<ReturnType<typeof baseQuery>["execute"]>
+>;
+
 const countQuery = (db: DB) =>
   db.select(Model.selects.count(timesheetProjects.id)).from(timesheetProjects);
+
+const basePostFormat = (
+  item: BaseProjectResult[0]
+): z.infer<typeof baseSchema> => ({
+  ...item,
+  contact: item.contact ? Contact.postFormat.base(item.contact) : null,
+  iconUrl: item.iconId
+    ? getAppUrl(env.ROOT_DOMAIN, "storage", `/file/${item.iconId}`)
+    : null,
+});
+
+const formPostFormat = (
+  item: z.infer<typeof baseSchema>
+): z.infer<typeof formSchema> => ({
+  ...item,
+  contactId: item.contact ? item.contact.id : 0,
+});
 
 const Project = {
   schemas: {
@@ -89,6 +114,10 @@ const Project = {
   queries: {
     base: baseQuery,
     count: countQuery,
+  },
+  postFormat: {
+    base: basePostFormat,
+    form: formPostFormat,
   },
 };
 

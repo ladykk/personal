@@ -2,7 +2,12 @@ import { createTRPCRouter, protectedProcedure } from "@/server";
 import { timesheetContacts } from "@/server/db/schema/timesheet";
 import Model from "@/server/models";
 import Contact from "@/server/models/timesheet/contact";
-import { paginationInput, paginationOutput } from "@/server/services/api";
+import {
+  arrayOutput,
+  baseInput,
+  paginationInput,
+  paginationOutput,
+} from "@/server/services/api";
 import {
   deleteFileById,
   generatePresignedUrl,
@@ -10,20 +15,95 @@ import {
   getIdFromUrl,
 } from "@/server/services/r2";
 import { TRPCError } from "@trpc/server";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, like, or } from "drizzle-orm";
 
 export const timesheetContactRouter = createTRPCRouter({
+  getContacts: protectedProcedure
+    .input(baseInput(Contact.schemas.filters))
+    .output(arrayOutput(Contact.schemas.base))
+    .query(async ({ input, ctx }) => {
+      const { ...filters } = input;
+      const whereClause = and(
+        eq(timesheetContacts.createdBy, ctx.session.user.id),
+        // Filter: isActive
+        typeof filters.isActive === "boolean"
+          ? eq(timesheetContacts.isActive, filters.isActive)
+          : undefined,
+        // Filter: searchKeyword
+        typeof filters.searchKeyword === "string"
+          ? or(
+              like(timesheetContacts.taxId, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.companyName, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.email, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.telNo, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.phoneNo, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.faxNo, `%${filters.searchKeyword}%`),
+              like(
+                timesheetContacts.contactPerson,
+                `%${filters.searchKeyword}%`
+              ),
+              like(
+                timesheetContacts.contactEmail,
+                `%${filters.searchKeyword}%`
+              ),
+              like(
+                timesheetContacts.contactPhoneNo,
+                `%${filters.searchKeyword}%`
+              )
+            )
+          : undefined,
+        // Filter: isHeadQuarters
+        typeof filters.isHeadQuarters === "boolean"
+          ? eq(timesheetContacts.isHeadQuarters, filters.isHeadQuarters)
+          : undefined
+      );
+
+      const result = await Contact.queries
+        .base(ctx.db)
+        .where(whereClause)
+        .execute();
+
+      return result.map(Contact.postFormat.base);
+    }),
+
   getPaginateContacts: protectedProcedure
     .input(paginationInput(Contact.schemas.filters))
     .output(paginationOutput(Contact.schemas.base))
     .query(async ({ input, ctx }) => {
-      const { page, itemsPerPage, isActive } = input;
+      const { page, itemsPerPage, ...filters } = input;
 
       const whereClause = and(
         eq(timesheetContacts.createdBy, ctx.session.user.id),
         // Filter: isActive
-        typeof isActive === "boolean"
-          ? eq(timesheetContacts.isActive, isActive)
+        typeof filters.isActive === "boolean"
+          ? eq(timesheetContacts.isActive, filters.isActive)
+          : undefined,
+        // Filter: searchKeyword
+        typeof filters.searchKeyword === "string"
+          ? or(
+              like(timesheetContacts.taxId, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.companyName, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.email, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.telNo, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.phoneNo, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.faxNo, `%${filters.searchKeyword}%`),
+              like(
+                timesheetContacts.contactPerson,
+                `%${filters.searchKeyword}%`
+              ),
+              like(
+                timesheetContacts.contactEmail,
+                `%${filters.searchKeyword}%`
+              ),
+              like(
+                timesheetContacts.contactPhoneNo,
+                `%${filters.searchKeyword}%`
+              )
+            )
+          : undefined,
+        // Filter: isHeadQuarters
+        typeof filters.isHeadQuarters === "boolean"
+          ? eq(timesheetContacts.isHeadQuarters, filters.isHeadQuarters)
           : undefined
       );
 
@@ -44,7 +124,7 @@ export const timesheetContactRouter = createTRPCRouter({
         currentPage: page,
         itemsPerPage,
         totalPages: Math.ceil(count[0].count / itemsPerPage),
-        list: Contact.postFormat.base(result),
+        list: result.map(Contact.postFormat.base),
       };
     }),
   getContact: protectedProcedure
@@ -67,7 +147,7 @@ export const timesheetContactRouter = createTRPCRouter({
           code: "NOT_FOUND",
         });
 
-      return Contact.postFormat.base(result)[0];
+      return result.map(Contact.postFormat.base)[0];
     }),
   createOrUpdateContact: protectedProcedure
     .input(Contact.schemas.form)

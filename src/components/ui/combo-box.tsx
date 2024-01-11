@@ -55,7 +55,11 @@ export function ComboBox<T, V extends string | number>(
   function Trigger() {
     return (
       <>
-        {selectedOption ? props.setLabel(selectedOption) : placeholder}
+        {selectedOption
+          ? props.customItemRender
+            ? props.customItemRender(selectedOption, true)
+            : props.setLabel(selectedOption)
+          : placeholder}
 
         {props.loading ? (
           <Spinner />
@@ -97,24 +101,22 @@ export function ComboBox<T, V extends string | number>(
                 setOpen(false);
               }}
             >
-              {props.customItemRender ? (
-                props.customItemRender(
-                  option,
-                  props.value === props.setValue(option)
-                )
-              ) : (
-                <Fragment>
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
+              <Fragment>
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    props.value === props.setValue(option)
+                      ? "opacity-100"
+                      : "opacity-0"
+                  )}
+                />
+                {props.customItemRender
+                  ? props.customItemRender(
+                      option,
                       props.value === props.setValue(option)
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
-                  {props.setLabel(option)}
-                </Fragment>
-              )}
+                    )
+                  : props.setLabel(option)}
+              </Fragment>
             </CommandItem>
           ))}
         </CommandGroup>
@@ -192,7 +194,7 @@ export function ComboBox<T, V extends string | number>(
               </Button>
             </div>
           </DrawerTrigger>
-          <DrawerContent>
+          <DrawerContent className="min-h-[50svh]">
             <Content />
           </DrawerContent>
         </Drawer>

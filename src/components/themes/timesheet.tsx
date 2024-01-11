@@ -99,6 +99,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
 ] as const;
 export function SidebarWrapper(props: SidebarWrapperProps) {
   const isOpen = useSidebarStore((state) => state.isOpen);
+  const close = useSidebarStore((state) => state.close);
   const pathname = usePathname().replace("/timesheet", "");
   return (
     <div className="flex-1 flex relative pt-[3.5rem] overflow-x-clip">
@@ -119,6 +120,7 @@ export function SidebarWrapper(props: SidebarWrapperProps) {
               }),
               "w-full justify-start gap-2 px-2"
             )}
+            onClick={close}
             href={getAppUrl(props.ROOT_DOMAIN, "timesheet", `/${item.href}`)}
           >
             {<item.icon />}

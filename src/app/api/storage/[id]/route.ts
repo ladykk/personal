@@ -167,3 +167,90 @@ export const PUT = async (req: NextRequest, props: Props) => {
     }
   );
 };
+
+// DELETE /api/storage/[id]
+export const DELETE = async (req: NextRequest, props: Props) => {
+  // Get file from database
+  const file = await db.query.files
+    .findFirst({
+      where: ({ id }, { eq }) => eq(id, props.params.id),
+    })
+    .execute();
+
+  // If file not found, return 404
+  if (!file)
+    return new Response(
+      JSON.stringify({
+        status: "error",
+        error: "Presign URL not found",
+      }),
+      {
+        status: 404,
+      }
+    );
+
+  // Check expired timestamp
+  if (
+    dayjs()
+      .add(env.R2_PRESIGNED_URL_EXPIRES_MINS, "minutes")
+      .isSameOrBefore(dayjs(file.issuedAt))
+  )
+    return new Response(
+      JSON.stringify({
+        status: "error",
+        error: "Presign URL expired",
+      }),
+      {
+        status: 401,
+      }
+    );
+
+  // Check access control
+  const isAuthorized = await checkAccessControl(file.writeAccessControl);
+
+  // If not authorized, return 401
+  if (!isAuthorized)
+    return new Response(
+      JSON.stringify({
+        staus: "error",
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+      }
+    );
+
+  // Delete file from R2
+  const r2 = new R2();
+  const result = await r2.deleteObject(file.id);
+
+  if (!result)
+    return new Response(
+      JSON.stringify({
+        status: "error",
+        error: "Delete failed",
+      }),
+      {
+        status: 500,
+      }
+    );
+
+  // Update upload timestamp
+  await db
+    .update(files)
+    .set({
+      uploadedAt: null,
+    })
+    .where(eq(files.id, file.id))
+    .execute();
+
+  // Return success
+  return new Response(
+    JSON.stringify({
+      status: "success",
+    }),
+    {
+      status: 200,
+    }
+  );
+};

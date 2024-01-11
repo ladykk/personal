@@ -51,6 +51,7 @@ export const timesheetProjects = pgTable("project", {
     onDelete: "set null",
   }),
   name: text("name").notNull(),
+  description: text("description").notNull().default(""),
   contactId: integer("contact_id").references(() => timesheetContacts.id, {
     onDelete: "restrict",
   }),
