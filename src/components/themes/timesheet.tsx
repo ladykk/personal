@@ -174,6 +174,24 @@ export function PageHeader(props: {
   );
 }
 
+export function FiltersContainer(props: {
+  left?: React.ReactNode;
+  right?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex items-end justify-between mb-5 gap-5",
+        props.className
+      )}
+    >
+      <div className="flex-1 flex items-end gap-3">{props.left}</div>
+      <div className="flex items-end gap-3">{props.right}</div>
+    </div>
+  );
+}
+
 export function FormContainer(
   props: JSX.IntrinsicAttributes &
     ClassAttributes<HTMLDivElement> &

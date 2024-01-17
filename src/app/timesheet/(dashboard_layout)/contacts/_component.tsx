@@ -1,6 +1,15 @@
 "use client";
-import { MainContainer, PageHeader } from "@/components/themes/timesheet";
+import {
+  BooleanDropdown,
+  SearchKeywordInput,
+} from "@/components/common/filters";
+import {
+  FiltersContainer,
+  MainContainer,
+  PageHeader,
+} from "@/components/themes/timesheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { DataTable, DataTablePagination } from "@/components/ui/data-table";
 import { useSearchParamsState } from "@/hooks/search-params";
@@ -44,6 +53,49 @@ export function TimesheetContactClient(props: TimesheetContactClientProps) {
         loading={query.isFetching}
         className="mb-5"
       />
+      <FiltersContainer
+        left={
+          <>
+            <SearchKeywordInput
+              defaultValue={searchParams.values.searchKeyword}
+              placeholder="Search by Tax ID, Company name, Email, Tel no, Phone no, Fax no, Contact person, Contact email, Contact phone no..."
+              className=" max-w-xs"
+              onChange={(value) =>
+                value.length > 1
+                  ? searchParams.set("searchKeyword", value)
+                  : searchParams.clear("searchKeyword")
+              }
+            />
+          </>
+        }
+        right={
+          <>
+            <BooleanDropdown
+              title="Is Head Quarters"
+              defaultValue={searchParams.values.isHeadQuarters}
+              label={{
+                default: "Yes / No",
+                true: "Yes",
+                false: "No",
+              }}
+              onChange={(value) =>
+                value
+                  ? searchParams.set("isHeadQuarters", value)
+                  : searchParams.clear("isHeadQuarters")
+              }
+            />
+            <BooleanDropdown
+              title="Is Active"
+              defaultValue={searchParams.values.isActive}
+              onChange={(value) =>
+                value
+                  ? searchParams.set("isActive", value)
+                  : searchParams.clear("isActive")
+              }
+            />
+          </>
+        }
+      />
       <DataTable
         data={query.data.list}
         className="mb-3"
@@ -82,6 +134,17 @@ export function TimesheetContactClient(props: TimesheetContactClientProps) {
               >
                 {row.original.companyName}
               </Link>
+            ),
+          },
+          {
+            header: "Is Active",
+            accessorKey: "isActive",
+            cell: ({ row }) => (
+              <Badge
+                variant={row.original.isActive ? "default" : "destructive"}
+              >
+                {row.original.isActive ? "Active" : "Inactive"}
+              </Badge>
             ),
           },
           {

@@ -42,8 +42,14 @@ const formSchema = baseSchema
 
 const filterSchema = {
   searchKeyword: z.string().optional(),
-  isActive: z.boolean().optional(),
-  isHeadQuarters: z.boolean().optional(),
+  isActive: z
+    .string()
+    .transform((value) => value === "1")
+    .optional(),
+  isHeadQuarters: z
+    .string()
+    .transform((value) => value === "1")
+    .optional(),
 };
 
 const idSchema = z.number().min(1, {
