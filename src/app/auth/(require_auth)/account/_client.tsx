@@ -76,8 +76,7 @@ export default function AuthAccountClient(props: Props) {
                       // Upload the image to S3
                       const imageResult = await uploadFile(
                         data.files.image,
-                        key,
-                        props.ROOT_DOMAIN
+                        key
                       );
 
                       // If the image upload failed, we need to stop the profile update
