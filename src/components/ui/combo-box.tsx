@@ -14,7 +14,7 @@ import { Spinner } from "./spinner";
 import { useMediaQuery } from "usehooks-ts";
 import { Drawer, DrawerContent, DrawerTrigger } from "./drawer";
 
-type ComboBoxProps<T, V extends string | number> = {
+export interface ComboBoxProps<T, V extends string | number> {
   value: V | undefined;
   onChange: (value: V | undefined) => void;
   options: Array<T> | undefined;
@@ -34,7 +34,7 @@ type ComboBoxProps<T, V extends string | number> = {
     trigger?: string;
     drawerTrigger?: string;
   };
-};
+}
 
 export function ComboBox<T, V extends string | number>(
   props: ComboBoxProps<T, V>

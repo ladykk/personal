@@ -1,6 +1,15 @@
 "use client";
-import { MainContainer, PageHeader } from "@/components/themes/timesheet";
-import { ContactDialog } from "@/components/timesheet/contact";
+import {
+  BooleanDropdown,
+  FilterItem,
+  SearchKeywordInput,
+} from "@/components/common/filters";
+import {
+  FiltersContainer,
+  MainContainer,
+  PageHeader,
+} from "@/components/themes/timesheet";
+import { ContactComboBox, ContactDialog } from "@/components/timesheet/contact";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -43,6 +52,49 @@ export function TimesheetProjectClient(props: TimesheetProjectClientProps) {
         }
         loading={query.isFetching}
         className="mb-5"
+      />
+      <FiltersContainer
+        left={
+          <>
+            <SearchKeywordInput
+              defaultValue={searchParams.values.searchKeyword}
+              placeholder="Search by Project name, Company name..."
+              className=" max-w-xs"
+              onChange={(value) =>
+                value.length > 1
+                  ? searchParams.set("searchKeyword", value)
+                  : searchParams.clear("searchKeyword")
+              }
+            />
+          </>
+        }
+        right={
+          <>
+            <FilterItem title="Contact">
+              <ContactComboBox
+                value={searchParams.values.contactId}
+                onChange={(value) =>
+                  value
+                    ? searchParams.set("contactId", value)
+                    : searchParams.clear("contactId")
+                }
+                setValue={(contact) => contact.id.toString()}
+                clearable
+                size="small"
+              />
+            </FilterItem>
+
+            <BooleanDropdown
+              title="Is Active"
+              defaultValue={searchParams.values.isActive}
+              onChange={(value) =>
+                value
+                  ? searchParams.set("isActive", value)
+                  : searchParams.clear("isActive")
+              }
+            />
+          </>
+        }
       />
       <DataTable
         data={query.data.list}

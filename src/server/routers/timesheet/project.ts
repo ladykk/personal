@@ -1,8 +1,11 @@
 import { createTRPCRouter, protectedProcedure } from "@/server";
 import Project from "@/server/models/timesheet/project";
 import Model from "@/server/models";
-import { and, eq } from "drizzle-orm";
-import { timesheetProjects } from "@/server/db/schema/timesheet";
+import { and, eq, like, or } from "drizzle-orm";
+import {
+  timesheetContacts,
+  timesheetProjects,
+} from "@/server/db/schema/timesheet";
 import { TRPCError } from "@trpc/server";
 import {
   deleteFileById,
@@ -14,13 +17,28 @@ import { paginationInput, paginationOutput } from "@/server/services/api";
 
 export const timesheetProjectRouter = createTRPCRouter({
   getPaginateProjects: protectedProcedure
-    .input(paginationInput({}))
+    .input(paginationInput(Project.schemas.filters))
     .output(paginationOutput(Project.schemas.base))
     .query(async ({ input, ctx }) => {
-      const { page, itemsPerPage } = input;
+      const { page, itemsPerPage, ...filters } = input;
 
       const whereClause = and(
-        eq(timesheetProjects.createdBy, ctx.session.user.id)
+        eq(timesheetProjects.createdBy, ctx.session.user.id),
+        // Filter: isActive
+        typeof filters.isActive === "boolean"
+          ? eq(timesheetProjects.isActive, filters.isActive)
+          : undefined,
+        // Filter: contactId
+        typeof filters.contactId === "number"
+          ? eq(timesheetContacts.id, filters.contactId)
+          : undefined,
+        /// Filter: searchKeyword
+        typeof filters.searchKeyword === "string"
+          ? or(
+              like(timesheetProjects.name, `%${filters.searchKeyword}%`),
+              like(timesheetContacts.companyName, `%${filters.searchKeyword}%`)
+            )
+          : undefined
       );
 
       const count = await Project.queries

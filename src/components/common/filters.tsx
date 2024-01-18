@@ -1,4 +1,4 @@
-import { JSX, RefAttributes, useEffect, useState } from "react";
+import { JSX, ReactNode, RefAttributes, useEffect, useState } from "react";
 import { Input, InputProps } from "../ui/input";
 import { useDebounce } from "usehooks-ts";
 import {
@@ -11,6 +11,17 @@ import {
 import { FormItem } from "../ui/form";
 import { Label } from "../ui/label";
 import { cn } from "@/lib/utils";
+
+export const FilterItem = (props: {
+  title: string;
+  className?: string;
+  children: ReactNode;
+}) => (
+  <FormItem className={cn("w-full", props.className)}>
+    <Label className=" whitespace-nowrap">{props.title}</Label>
+    {props.children}
+  </FormItem>
+);
 
 export const SearchKeywordInput = (
   props: Omit<
@@ -31,15 +42,14 @@ export const SearchKeywordInput = (
   }, [debounce]);
 
   return (
-    <FormItem className={cn("w-full", props.className)}>
-      <Label className=" whitespace-nowrap">{props.title ?? "Search"}</Label>
+    <FilterItem title={props.title ?? "Search"}>
       <Input
         {...props}
         className=""
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
-    </FormItem>
+    </FilterItem>
   );
 };
 
@@ -59,8 +69,7 @@ export const BooleanDropdown = (props: {
     props.onChange?.(value);
   }, [value]);
   return (
-    <FormItem className={props.className}>
-      <Label className=" whitespace-nowrap">{props.title}</Label>
+    <FilterItem title={props.title}>
       <Select
         value={value ?? "-"}
         onValueChange={(value) => setValue(value === "-" ? undefined : value)}
@@ -76,6 +85,6 @@ export const BooleanDropdown = (props: {
           <SelectItem value="0">{props.label?.false ?? "False"}</SelectItem>
         </SelectContent>
       </Select>
-    </FormItem>
+    </FilterItem>
   );
 };

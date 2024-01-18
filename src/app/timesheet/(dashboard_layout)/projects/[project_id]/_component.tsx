@@ -4,6 +4,7 @@ import {
   MainContainer,
   PageHeader,
 } from "@/components/themes/timesheet";
+import { ContactComboBox } from "@/components/timesheet/contact";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ComboBox } from "@/components/ui/combo-box";
@@ -212,38 +213,9 @@ export default function TimesheetProjectFormClient(
                   <FormItem>
                     <FormLabel required>Contact</FormLabel>
                     <FormControl>
-                      <ComboBox
+                      <ContactComboBox
                         {...field}
-                        options={contacts.data}
-                        setLabel={(contact) => contact.companyName}
                         setValue={(contact) => contact.id}
-                        loading={contacts.isFetching}
-                        placeholder="Select a contact..."
-                        setKeyword={Contact.postFormat.keyword}
-                        searchPlaceholder="Search by company name/contact person/email/phone..."
-                        searchNoResultText="No contact found."
-                        classNames={{
-                          trigger: "h-13",
-                          drawerTrigger: "h-13",
-                        }}
-                        customItemRender={(contact) => (
-                          <div className="flex items-center gap-3 justify-start">
-                            <Avatar className="w-8 h-8">
-                              <AvatarImage src={contact.avatarUrl} />
-                              <AvatarFallback>
-                                {getNamePrefix(contact.companyName)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="text-left">
-                              <div className="font-medium">
-                                {contact.companyName}
-                              </div>
-                              <span className="block text-xs text-gray-500">
-                                {contact.contactPerson}
-                              </span>
-                            </div>
-                          </div>
-                        )}
                       />
                     </FormControl>
                     <FormMessage />

@@ -41,15 +41,9 @@ const formSchema = baseSchema
   });
 
 const filterSchema = {
-  searchKeyword: z.string().optional(),
-  isActive: z
-    .string()
-    .transform((value) => value === "1")
-    .optional(),
-  isHeadQuarters: z
-    .string()
-    .transform((value) => value === "1")
-    .optional(),
+  searchKeyword: Model.searchParams.string,
+  isActive: Model.searchParams.boolean,
+  isHeadQuarters: Model.searchParams.boolean,
 };
 
 const idSchema = z.number().min(1, {

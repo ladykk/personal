@@ -1,3 +1,4 @@
+"use client";
 import { RouterOutputs } from "@/trpc/shared";
 import {
   Dialog,
@@ -9,12 +10,13 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { getNamePrefix } from "@/lib/utils";
+import { cn, getNamePrefix } from "@/lib/utils";
 import { EmailLink, FaxLink, PhoneLink } from "../common/links";
-import { Label } from "../ui/label";
-import { Separator } from "../ui/separator";
 import { LabelContainer } from "../themes/timesheet";
 import { Badge } from "../ui/badge";
+import { ComboBox, ComboBoxProps } from "../ui/combo-box";
+import { trpc } from "@/trpc/client";
+import Contact from "@/server/models/timesheet/contact";
 
 interface BaseContactProps {
   contact: RouterOutputs["timesheet"]["contact"]["getContact"] | null;
@@ -62,12 +64,19 @@ export function ContactInfo(props: BaseContactProps) {
   );
 }
 
-export function ContactDialog(props: BaseContactProps) {
+interface ContactDialogProps extends BaseContactProps {
+  className?: string;
+}
+
+export function ContactDialog(props: ContactDialogProps) {
   if (!props.contact) return;
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className=" h-fit px-2.5 py-1.5 gap-2">
+        <Button
+          variant="outline"
+          className={cn("h-fit px-2.5 py-1.5 gap-2", props.className)}
+        >
           <Avatar className="w-10 h-10">
             <AvatarImage
               src={props.contact.avatarUrl}
@@ -132,5 +141,59 @@ export function ContactDialog(props: BaseContactProps) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function ContactComboBox<V extends string | number>(
+  props: Omit<
+    ComboBoxProps<RouterOutputs["timesheet"]["contact"]["getContacts"][0], V>,
+    "options" | "setLabel"
+  > & {
+    size?: "default" | "small";
+  }
+) {
+  const contacts = trpc.timesheet.contact.getContacts.useQuery(
+    {},
+    { staleTime: Infinity }
+  );
+
+  return (
+    <ComboBox
+      {...props}
+      options={contacts.data}
+      setLabel={(contact) => contact.companyName}
+      loading={contacts.isFetching}
+      placeholder={props.placeholder ?? "Select a contact..."}
+      setKeyword={Contact.postFormat.keyword}
+      searchPlaceholder="Search by company name/contact person/email/phone..."
+      searchNoResultText="No contact found."
+      classNames={{
+        trigger: props.size === "small" ? "h-10" : "h-13",
+        drawerTrigger: props.size === "small" ? "h-10" : "h-13",
+      }}
+      customItemRender={(contact) => (
+        <div
+          className={cn(
+            "flex items-center justify-start",
+            props.size === "small" ? "gap-2" : "gap-3"
+          )}
+        >
+          <Avatar className={props.size === "small" ? "w-6 h-6" : "w-8 h-8"}>
+            <AvatarImage src={contact.avatarUrl} />
+            <AvatarFallback>
+              {getNamePrefix(contact.companyName)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="text-left">
+            <div className="font-medium">{contact.companyName}</div>
+            {props.size !== "small" && (
+              <span className="block text-xs text-gray-500">
+                {contact.contactPerson}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+    />
   );
 }

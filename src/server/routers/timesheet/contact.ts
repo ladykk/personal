@@ -78,6 +78,10 @@ export const timesheetContactRouter = createTRPCRouter({
         typeof filters.isActive === "boolean"
           ? eq(timesheetContacts.isActive, filters.isActive)
           : undefined,
+        // Filter: isHeadQuarters
+        typeof filters.isHeadQuarters === "boolean"
+          ? eq(timesheetContacts.isHeadQuarters, filters.isHeadQuarters)
+          : undefined,
         // Filter: searchKeyword
         typeof filters.searchKeyword === "string"
           ? or(
@@ -100,10 +104,6 @@ export const timesheetContactRouter = createTRPCRouter({
                 `%${filters.searchKeyword}%`
               )
             )
-          : undefined,
-        // Filter: isHeadQuarters
-        typeof filters.isHeadQuarters === "boolean"
-          ? eq(timesheetContacts.isHeadQuarters, filters.isHeadQuarters)
           : undefined
       );
 

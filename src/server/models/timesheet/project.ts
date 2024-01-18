@@ -35,6 +35,12 @@ const formSchema = baseSchema
     contactId: Contact.schemas.id,
   });
 
+const filtersSchema = {
+  searchKeyword: Model.searchParams.string,
+  isActive: Model.searchParams.boolean,
+  contactId: Model.searchParams.number,
+};
+
 const formValidate = async (
   db: DB,
   userId: string,
@@ -84,7 +90,13 @@ type BaseProjectResult = Awaited<
 >;
 
 const countQuery = (db: DB) =>
-  db.select(Model.selects.count(timesheetProjects.id)).from(timesheetProjects);
+  db
+    .select(Model.selects.count(timesheetProjects.id))
+    .from(timesheetProjects)
+    .leftJoin(
+      timesheetContacts,
+      eq(timesheetProjects.contactId, timesheetContacts.id)
+    );
 
 const basePostFormat = (
   item: BaseProjectResult[0]
@@ -107,6 +119,7 @@ const Project = {
   schemas: {
     base: baseSchema,
     form: formSchema,
+    filters: filtersSchema,
   },
   validations: {
     form: formValidate,

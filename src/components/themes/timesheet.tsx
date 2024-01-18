@@ -207,7 +207,7 @@ export function FormContainer(
 
 export function Loading() {
   return (
-    <MainContainer className="h-full flex items-center justify-center bg-black/30">
+    <MainContainer className="h-full flex items-center justify-center ">
       <Spinner className="w-14 h-14" />
     </MainContainer>
   );
@@ -219,8 +219,13 @@ export function LabelContainer(props: {
   className?: string;
 }) {
   return (
-    <div className={cn("p-3 pt-4 border relative mt-1", props.className)}>
-      <Label className="whitespace-nowrap absolute top-0 left-[0.5rem] -translate-y-2 bg-white px-1.5">
+    <div
+      className={cn(
+        "px-5 pb-3 pt-4 border relative mt-1 rounded-md",
+        props.className
+      )}
+    >
+      <Label className="whitespace-nowrap absolute top-0 left-[0.5rem] -translate-y-2 bg-background px-1.5">
         {props.label}
       </Label>
       {props.children}
