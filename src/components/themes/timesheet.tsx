@@ -9,10 +9,11 @@ import { cn } from "@/lib/utils";
 import { getAppUrl } from "@/lib/url";
 import { create } from "zustand";
 import { BookUser, FolderKanban, LucideIcon, Menu, X } from "lucide-react";
-import { JSX, ClassAttributes, HTMLAttributes } from "react";
+import { JSX, ClassAttributes, HTMLAttributes, ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { BackButton } from "../common/links";
 import { Spinner } from "../ui/spinner";
+import { Label } from "../ui/label";
 
 type NavbarProps = {
   ROOT_DOMAIN: string;
@@ -180,14 +181,11 @@ export function FiltersContainer(props: {
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "flex items-end justify-between mb-5 gap-5",
-        props.className
-      )}
-    >
-      <div className="flex-1 flex items-end gap-3">{props.left}</div>
-      <div className="flex items-end gap-3">{props.right}</div>
+    <div className="flex justify-between items-end mb-5 gap-5">
+      <div className="flex-1 flex items-center gap-3">{props.left}</div>
+      <div className="flex-1 flex items-center gap-3 justify-end">
+        {props.right}
+      </div>
     </div>
   );
 }
@@ -212,5 +210,20 @@ export function Loading() {
     <MainContainer className="h-full flex items-center justify-center bg-black/30">
       <Spinner className="w-14 h-14" />
     </MainContainer>
+  );
+}
+
+export function LabelContainer(props: {
+  label: string;
+  children?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("p-3 pt-4 border relative mt-1", props.className)}>
+      <Label className="whitespace-nowrap absolute top-0 left-[0.5rem] -translate-y-2 bg-white px-1.5">
+        {props.label}
+      </Label>
+      {props.children}
+    </div>
   );
 }

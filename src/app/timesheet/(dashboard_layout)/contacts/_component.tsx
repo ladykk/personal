@@ -8,6 +8,7 @@ import {
   MainContainer,
   PageHeader,
 } from "@/components/themes/timesheet";
+import { ContactInfo, ContactPersonInfo } from "@/components/timesheet/contact";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -150,104 +151,12 @@ export function TimesheetContactClient(props: TimesheetContactClientProps) {
           {
             header: "Contact Person",
             accessorKey: "contactPerson",
-            cell: ({ row }) => (
-              <div className="flex flex-col items-start gap-1">
-                <p>{row.original.contactPerson}</p>
-                {row.original.contactEmail &&
-                  row.original.contactEmail.split(",").map((email) => (
-                    <Link
-                      key={email.trim()}
-                      className={buttonVariants({
-                        variant: "link",
-                        size: "fit",
-                      })}
-                      href={`mailto:${email.trim()}`}
-                    >
-                      <Mail className="w-4 h-4 mr-2" />
-                      {email.trim()}
-                    </Link>
-                  ))}
-                {row.original.contactPhoneNo &&
-                  row.original.contactPhoneNo.split(",").map((phoneNo) => (
-                    <Link
-                      key={phoneNo.trim()}
-                      className={buttonVariants({
-                        variant: "link",
-                        size: "fit",
-                      })}
-                      href={`tel:${phoneNo.trim()}`}
-                    >
-                      <Smartphone className="w-4 h-4 mr-2" />
-                      {phoneNo.trim()}
-                    </Link>
-                  ))}
-              </div>
-            ),
+            cell: ({ row }) => <ContactPersonInfo contact={row.original} />,
           },
           {
             header: "Contacts",
             id: "contacts",
-            cell: ({ row }) => (
-              <div className="flex flex-col items-start gap-1">
-                {row.original.email &&
-                  row.original.email.split(",").map((email) => (
-                    <Link
-                      key={email.trim()}
-                      className={buttonVariants({
-                        variant: "link",
-                        size: "fit",
-                      })}
-                      href={`mailto:${email.trim()}`}
-                    >
-                      <Mail className="w-4 h-4 mr-2" />
-                      {email.trim()}
-                    </Link>
-                  ))}
-
-                {row.original.telNo &&
-                  row.original.telNo.split(",").map((telNo) => (
-                    <Link
-                      key={telNo.trim()}
-                      className={buttonVariants({
-                        variant: "link",
-                        size: "fit",
-                      })}
-                      href={`tel:${telNo.trim()}`}
-                    >
-                      <Phone className="w-4 h-4 mr-2" />
-                      {telNo.trim()}
-                    </Link>
-                  ))}
-                {row.original.phoneNo &&
-                  row.original.phoneNo.split(",").map((phoneNo) => (
-                    <Link
-                      key={phoneNo.trim()}
-                      className={buttonVariants({
-                        variant: "link",
-                        size: "fit",
-                      })}
-                      href={`tel:${phoneNo.trim()}`}
-                    >
-                      <Smartphone className="w-4 h-4 mr-2" />
-                      {phoneNo.trim()}
-                    </Link>
-                  ))}
-                {row.original.faxNo &&
-                  row.original.faxNo.split(",").map((faxNo) => (
-                    <Link
-                      key={faxNo.trim()}
-                      className={buttonVariants({
-                        variant: "link",
-                        size: "fit",
-                      })}
-                      href={`tel:${faxNo.trim()}`}
-                    >
-                      <Printer className="w-4 h-4 mr-2" />
-                      {faxNo.trim()}
-                    </Link>
-                  ))}
-              </div>
-            ),
+            cell: ({ row }) => <ContactInfo contact={row.original} />,
           },
           {
             header: "Address",
@@ -259,6 +168,9 @@ export function TimesheetContactClient(props: TimesheetContactClientProps) {
           {
             header: "Remark",
             accessorKey: "remark",
+            cell: ({ row }) => (
+              <p className="max-w-xs">{row.original.remark}</p>
+            ),
           },
         ]}
       />

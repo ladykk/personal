@@ -1,8 +1,13 @@
 import { JSX, RefAttributes, useEffect, useState } from "react";
 import { Input, InputProps } from "../ui/input";
 import { useDebounce } from "usehooks-ts";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
-import { SelectValue } from "@radix-ui/react-select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { FormItem } from "../ui/form";
 import { Label } from "../ui/label";
 import { cn } from "@/lib/utils";
@@ -27,7 +32,7 @@ export const SearchKeywordInput = (
 
   return (
     <FormItem className={cn("w-full", props.className)}>
-      <Label>{props.title ?? "Search"}</Label>
+      <Label className=" whitespace-nowrap">{props.title ?? "Search"}</Label>
       <Input
         {...props}
         className=""
@@ -54,8 +59,8 @@ export const BooleanDropdown = (props: {
     props.onChange?.(value);
   }, [value]);
   return (
-    <FormItem className={cn("w-full", props.className)}>
-      <Label>{props.title}</Label>
+    <FormItem className={props.className}>
+      <Label className=" whitespace-nowrap">{props.title}</Label>
       <Select
         value={value ?? "-"}
         onValueChange={(value) => setValue(value === "-" ? undefined : value)}
